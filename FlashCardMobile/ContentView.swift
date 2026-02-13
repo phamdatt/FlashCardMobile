@@ -90,7 +90,7 @@ struct MainTabView: View {
                 .tabItem { Label("Cài đặt", systemImage: "gearshape.fill") }
                 .tag(Tab.settings.rawValue)
         }
-        .tint(AppTheme.primary)
+        .tint(AppTheme.iconTint)
         .onAppear {
             UITabBar.appearance().unselectedItemTintColor = UIColor(AppTheme.tabBarInactive)
         }

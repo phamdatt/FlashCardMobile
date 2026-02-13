@@ -49,7 +49,7 @@ struct MultipleChoicePracticeScreen: View {
             }
         }
         .onAppear {
-            cards = DatabaseManager.shared.loadFlashcards(for: topic.id).shuffled()
+            cards = topic.flashcards.shuffled()
         }
         .sheet(isPresented: $showResult) {
             PracticeResultSheet(

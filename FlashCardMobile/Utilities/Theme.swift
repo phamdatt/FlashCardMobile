@@ -43,6 +43,8 @@ enum AppTheme {
     static let accentRed = Color(red: 0.96, green: 0.32, blue: 0.32)
     static let accentOrange = Color(red: 1.0, green: 0.6, blue: 0.2)
     static let textSecondary = Color(UIColor.secondaryLabel)
+    /// Màu icon: primary ở light, gray ở dark
+    static let iconTint = Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor(red: 0.25, green: 0.47, blue: 1.0, alpha: 1.0) })
     /// Màu icon tab khi không chọn — hài hòa với primary
     static let tabBarInactive = Color(UIColor.secondaryLabel)
 }

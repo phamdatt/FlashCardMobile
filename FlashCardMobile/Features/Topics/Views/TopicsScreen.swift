@@ -11,6 +11,11 @@ struct TopicsScreen: View {
     @StateObject private var topicsViewModel: TopicsViewModel
     @State private var selectedTopic: Topic?
     @State private var showAddTopic = false
+    @State private var showPracticeAll = false
+
+    private var isReadingSubject: Bool {
+        subject.name == "Bài đọc"
+    }
 
     init(subject: Subject, viewModel: AppViewModel) {
         self.subject = subject
@@ -21,6 +26,9 @@ struct TopicsScreen: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
+                if !isReadingSubject {
+                    practiceAllButton
+                }
                 ForEach(topicsViewModel.filteredTopics) { topic in
                     TopicCard(topic: topic, subjectName: subject.name) {
                         selectedTopic = topic
@@ -74,6 +82,9 @@ struct TopicsScreen: View {
                 FlashcardListScreen(topic: topic, subject: subject, viewModel: viewModel)
             }
         }
+        .navigationDestination(isPresented: $showPracticeAll) {
+            PracticeAllScreen(subject: subject)
+        }
         .sheet(isPresented: $showAddTopic) {
             AddTopicSheet(viewModel: topicsViewModel, onDismiss: {
                 showAddTopic = false
@@ -103,6 +114,39 @@ struct TopicsScreen: View {
                 Text("Chủ đề \"\(t.name)\" và tất cả từ vựng sẽ bị xóa vĩnh viễn.")
             }
         }
+    }
+
+    private var practiceAllButton: some View {
+        Button {
+            HapticFeedback.impact()
+            showPracticeAll = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "rectangle.stack.fill")
+                    .font(.title2)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Luyện tập tất cả")
+                        .fontWeight(.semibold)
+                    Text("Ôn tập toàn bộ \(subject.name)")
+                        .font(.caption)
+                        .opacity(0.9)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+            }
+            .padding(16)
+            .foregroundStyle(.white)
+            .background(
+                LinearGradient(
+                    colors: [AppTheme.primary.opacity(0.9), Color(red: 0.56, green: 0.34, blue: 0.89)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(HapticButtonStyle())
     }
 }
 

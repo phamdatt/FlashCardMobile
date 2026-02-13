@@ -339,6 +339,122 @@ class DatabaseManager {
         return false
     }
 
+    func countAllFlashcards(subjectId: Int? = nil) -> Int {
+        guard db != nil else { return 0 }
+        var sql = "SELECT COUNT(*) FROM vocabularies v"
+        if subjectId != nil {
+            sql += " JOIN topics t ON v.topic_id = t.id WHERE t.subject_id = ?"
+        }
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return 0 }
+        defer { sqlite3_finalize(stmt) }
+        if let sid = subjectId {
+            sqlite3_bind_int(stmt, 1, Int32(sid))
+        }
+        return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt, 0)) : 0
+    }
+
+    func loadAllFlashcards(subjectId: Int? = nil, limit: Int? = nil) -> [Flashcard] {
+        guard db != nil else { return [] }
+        let hasNotes = hasColumn(table: "vocabularies", column: "notes")
+        let hasRadical = hasColumn(table: "vocabularies", column: "radical")
+        let hasPhonetic = hasColumn(table: "vocabularies", column: "phonetic")
+        var cols = "v.id, v.question, v.answer, v.hint"
+        if hasNotes { cols += ", v.notes" }
+        if hasRadical { cols += ", v.radical" }
+        if hasPhonetic { cols += ", v.phonetic" }
+        var sql = "SELECT \(cols) FROM vocabularies v"
+        if subjectId != nil {
+            sql += " JOIN topics t ON v.topic_id = t.id WHERE t.subject_id = ?"
+        }
+        if let lim = limit, lim > 0 {
+            sql += " ORDER BY RANDOM() LIMIT \(lim)"
+        } else {
+            sql += " ORDER BY v.id"
+        }
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(stmt) }
+        if let sid = subjectId {
+            sqlite3_bind_int(stmt, 1, Int32(sid))
+        }
+
+        var flashcards: [Flashcard] = []
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            let id = Int(sqlite3_column_int(stmt, 0))
+            let question = String(cString: sqlite3_column_text(stmt, 1))
+            let answer = String(cString: sqlite3_column_text(stmt, 2))
+            let hint: String? = sqlite3_column_text(stmt, 3).map { String(cString: $0) }
+            var notes: String? = nil, radical: String? = nil, phonetic: String? = nil
+            var idx: Int32 = 4
+            if hasNotes { notes = sqlite3_column_text(stmt, idx).map { String(cString: $0) }; idx += 1 }
+            if hasRadical { radical = sqlite3_column_text(stmt, idx).map { String(cString: $0) }; idx += 1 }
+            if hasPhonetic { phonetic = sqlite3_column_text(stmt, idx).map { String(cString: $0) } }
+
+            flashcards.append(Flashcard(
+                id: id,
+                question: question,
+                answer: answer,
+                hint: hint,
+                options: nil,
+                correctAnswer: nil,
+                exerciseType: Flashcard.exerciseTypeLabel,
+                notes: notes,
+                radical: radical,
+                phonetic: phonetic
+            ))
+        }
+        return generateOptions(for: flashcards)
+    }
+
+    func findSimilarFlashcards(for flashcard: Flashcard) -> [Flashcard] {
+        guard db != nil else { return [] }
+        let allCards = loadAllFlashcards()
+        let targetHanzi = flashcard.questionDisplayText
+        let targetPinyin = (flashcard.displayPhonetic ?? "").lowercased()
+            .replacingOccurrences(of: " ", with: "")
+
+        var scored: [(Flashcard, Double)] = []
+        for card in allCards {
+            guard card.id != flashcard.id else { continue }
+            let hanzi = card.questionDisplayText
+            let pinyin = (card.displayPhonetic ?? "").lowercased()
+                .replacingOccurrences(of: " ", with: "")
+            var score = 0.0
+
+            // Hanzi character overlap
+            let targetChars = Set(targetHanzi)
+            let cardChars = Set(hanzi)
+            let commonChars = targetChars.intersection(cardChars)
+            if !targetChars.isEmpty && !cardChars.isEmpty {
+                score += Double(commonChars.count) / Double(max(targetChars.count, cardChars.count)) * 50
+            }
+
+            // Same radical
+            if let r1 = flashcard.radical, !r1.isEmpty, let r2 = card.radical, !r2.isEmpty {
+                if r1 == r2 { score += 30 }
+            }
+
+            // Pinyin similarity
+            if !targetPinyin.isEmpty && !pinyin.isEmpty {
+                // Remove tone numbers/marks for base comparison
+                let basePinyin1 = targetPinyin.filter { $0.isLetter }
+                let basePinyin2 = pinyin.filter { $0.isLetter }
+                if basePinyin1 == basePinyin2 {
+                    score += 40 // Same sound, different tone
+                } else if basePinyin1.hasPrefix(basePinyin2) || basePinyin2.hasPrefix(basePinyin1) {
+                    score += 20
+                }
+            }
+
+            if score > 10 {
+                scored.append((card, score))
+            }
+        }
+
+        return scored.sorted { $0.1 > $1.1 }.prefix(20).map { $0.0 }
+    }
+
     func searchFlashcards(query: String) -> [(Flashcard, Topic, Subject)] {
         guard db != nil else { return [] }
         let q = query.trimmingCharacters(in: .whitespaces).lowercased()

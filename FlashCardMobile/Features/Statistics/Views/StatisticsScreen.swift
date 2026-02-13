@@ -44,11 +44,11 @@ struct StatisticsScreen: View {
     }
 
     private var overviewSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Tổng quan")
                 .font(.headline)
                 .fontWeight(.semibold)
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 StatCard(
                     icon: "rectangle.stack.fill",
                     value: "\(viewModel.totalCards)",
@@ -66,12 +66,14 @@ struct StatisticsScreen: View {
     }
 
     private var subjectBreakdown: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Theo môn học")
                 .font(.headline)
                 .fontWeight(.semibold)
-            ForEach(viewModel.subjects) { subject in
-                SubjectStatRow(subject: subject)
+            VStack(spacing: 12) {
+                ForEach(viewModel.subjects) { subject in
+                    SubjectStatRow(subject: subject)
+                }
             }
         }
     }
@@ -96,7 +98,7 @@ struct StatCard: View {
                 .foregroundStyle(AppTheme.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .padding(16)
         .cardStyle()
     }
 }
@@ -112,9 +114,9 @@ struct SubjectStatRow: View {
         HStack(spacing: 16) {
             Image(systemName: subject.displayIcon)
                 .font(.title2)
-                .foregroundStyle(AppTheme.textSecondary)
+                .foregroundStyle(AppTheme.iconTint)
                 .frame(width: 40, alignment: .center)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(subject.name)
                     .font(.headline)
                 Text("\(cardCount) từ • \(subject.topics.count) chủ đề")
@@ -123,7 +125,7 @@ struct SubjectStatRow: View {
             }
             Spacer()
         }
-        .padding()
-        .subtleCard()
+        .padding(16)
+        .cardStyle()
     }
 }

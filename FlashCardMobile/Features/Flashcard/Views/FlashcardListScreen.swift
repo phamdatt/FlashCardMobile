@@ -12,11 +12,6 @@ struct FlashcardListScreen: View {
     @StateObject private var listViewModel: FlashcardListViewModel
     @State private var selectedFlashcard: Flashcard?
     @State private var showPracticePicker = false
-    @State private var showFlipPractice = false
-    @State private var showMultipleChoicePractice = false
-    @State private var showListeningPractice = false
-    @State private var showMeaningToHanziPractice = false
-    @State private var practiceType: PracticeType = .flipCard
     @State private var showAddFlashcard = false
     @State private var showExportSheet = false
     @State private var showImportSheet = false
@@ -118,28 +113,8 @@ struct FlashcardListScreen: View {
                 Text("Từ \"\(c.questionDisplayText)\" sẽ bị xóa vĩnh viễn.")
             }
         }
-        .sheet(isPresented: $showPracticePicker) {
-            PracticeTypePicker(selected: $practiceType, subjectName: subject.name) {
-                showPracticePicker = false
-                switch practiceType {
-                case .flipCard: showFlipPractice = true
-                case .multipleChoice: showMultipleChoicePractice = true
-                case .listening: showListeningPractice = true
-                case .meaningToHanzi: showMeaningToHanziPractice = true
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $showFlipPractice) {
-            FlipCardPracticeScreen(topic: listViewModel.topicForPractice, subject: subject)
-        }
-        .fullScreenCover(isPresented: $showMultipleChoicePractice) {
-            MultipleChoicePracticeScreen(topic: listViewModel.topicForPractice, subject: subject)
-        }
-        .fullScreenCover(isPresented: $showListeningPractice) {
-            ListeningPracticeScreen(topic: listViewModel.topicForPractice, subject: subject)
-        }
-        .fullScreenCover(isPresented: $showMeaningToHanziPractice) {
-            MeaningToHanziPracticeScreen(topic: listViewModel.topicForPractice, subject: subject)
+        .navigationDestination(isPresented: $showPracticePicker) {
+            PracticeAllScreen(subject: subject, topic: listViewModel.topicForPractice)
         }
     }
 
