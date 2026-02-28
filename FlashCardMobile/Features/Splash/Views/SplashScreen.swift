@@ -1,189 +1,260 @@
-//
-//  SplashScreen.swift
-//  FlashCardMobile
-//
-
 import SwiftUI
 
 struct SplashScreen: View {
     let onFinish: () -> Void
-    @State private var bookOpen: CGFloat = 0
-    @State private var birdOffset: CGSize = .zero
-    @State private var birdOpacity: Double = 1
-    @State private var birdScale: CGFloat = 0.5
-    @State private var birdRotation: Double = 0
-    @State private var textOpacity: Double = 0
+
+    // States for animations
+    @State private var cardsAppeared = false
+    @State private var cardsFanned = false
+    @State private var frontFlipped = false
+    @State private var textAnimated = false
+    @State private var bgAnimate = false
+    @State private var sparkles: [ModernSparkle] = []
 
     var body: some View {
         ZStack {
-            AppTheme.primaryGradient
+            // 1. Modern Background: Animated Mesh-like Gradient
+            LinearGradient(colors: [AppTheme.primary, AppTheme.accentViolet], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .overlay(
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.accentOrange.opacity(0.4))
+                            .frame(width: 400)
+                            .offset(x: bgAnimate ? 100 : -100, y: bgAnimate ? -200 : -150)
+                        Circle()
+                            .fill(AppTheme.accentViolet.opacity(0.4))
+                            .frame(width: 300)
+                            .offset(x: bgAnimate ? -120 : 120, y: bgAnimate ? 200 : 150)
+                    }
+                    .blur(radius: 80)
+                )
                 .ignoresSafeArea()
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 5).repeatForever(autoreverses: true)) {
+                        bgAnimate.toggle()
+                    }
+                }
+
+            // 2. Sparkle Particles
+            ForEach(sparkles) { s in
+                Image(systemName: "sparkle")
+                    .font(.system(size: s.size))
+                    .foregroundStyle(.white)
+                    .position(x: s.x, y: s.y)
+                    .opacity(s.opacity)
+                    .scaleEffect(s.opacity)
+            }
 
             VStack(spacing: 0) {
                 Spacer()
-                ZStack {
-                    AnimatedBook(openAmount: bookOpen)
-                        .frame(width: 150, height: 100)
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 5)
 
-                    SwallowShape()
-                        .fill(.white)
-                        .frame(width: 48, height: 32)
-                        .scaleEffect(birdScale)
-                        .rotationEffect(.degrees(birdRotation))
-                        .offset(x: 40 + birdOffset.width, y: -38 + birdOffset.height)
-                        .opacity(birdOpacity)
-                        .shadow(color: .black.opacity(0.25), radius: 4)
+                // 3. Card Stack Area
+                ZStack {
+                    // Central Glow
+                    Circle()
+                        .fill(.white.opacity(0.15))
+                        .frame(width: 250)
+                        .blur(radius: 50)
+                        .scaleEffect(frontFlipped ? 1.2 : 0.8)
+
+                    // Card 2 (Back-right) - Chinese
+                    ModernSplashCard(
+                        character: "你好", subtitle: "nǐ hǎo",
+                        color: AppTheme.accentViolet,
+                        rotation: cardsFanned ? 15 : 0,
+                        xOffset: cardsFanned ? 40 : 0,
+                        scale: cardsAppeared ? 1 : 0.5
+                    )
+
+                    // Card 1 (Back-left) - English
+                    ModernSplashCard(
+                        character: "Hello", subtitle: "xin chào",
+                        color: AppTheme.accentOrange,
+                        rotation: cardsFanned ? -15 : 0,
+                        xOffset: cardsFanned ? -40 : 0,
+                        scale: cardsAppeared ? 1 : 0.5
+                    )
+
+                    // Card 0 (Front - Flipping)
+                    ModernFlipCard(isFlipped: frontFlipped, appeared: cardsAppeared)
                 }
-                .frame(height: 200)
+                .frame(height: 300)
 
                 Spacer()
-                VStack(spacing: 8) {
+
+                // 4. Branding Area
+                VStack(spacing: 12) {
                     Text("FlashCard")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: 40, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
-                    Text("Học từ vựng hiệu quả")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .shadow(color: .black.opacity(0.1), radius: 10)
+                        .blur(radius: textAnimated ? 0 : 10)
+                    
+                    Text(L("splash.subtitle").uppercased())
+                        .font(.system(size: 14, weight: .bold))
+                        .tracking(3)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
-                .opacity(textOpacity)
-                .padding(.bottom, 60)
+                .opacity(textAnimated ? 1 : 0)
+                .offset(y: textAnimated ? 0 : 20)
+                .padding(.bottom, 50)
             }
         }
-        .onAppear {
-            withAnimation(.easeOut(duration: 1.2)) {
-                bookOpen = 1
+        .onAppear { startModernAnimation() }
+    }
+
+    private func startModernAnimation() {
+        // Phase 1: Pop in with heavy bounce
+        withAnimation(.spring(duration: 0.6, bounce: 0.5)) {
+            cardsAppeared = true
+        }
+
+        // Phase 2: Fan out
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            withAnimation(.spring(duration: 0.7, bounce: 0.4)) {
+                cardsFanned = true
             }
-            withAnimation(.easeOut(duration: 0.6)) {
-                birdScale = 1
+        }
+
+        // Phase 3: Flip and Haptic
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            
+            withAnimation(.spring(duration: 0.6, bounce: 0.3)) {
+                frontFlipped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                withAnimation(.easeOut(duration: 0.5)) {
-                    textOpacity = 1
-                }
+            emitModernSparkles()
+        }
+
+        // Phase 4: Text reveal
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+            withAnimation(.easeOut(duration: 0.8)) {
+                textAnimated = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                withAnimation(.easeInOut(duration: 1.0)) {
-                    birdOffset = CGSize(width: 120, height: -180)
-                    birdOpacity = 0
-                    birdRotation = -15
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.9) {
-                onFinish()
+        }
+
+        // Finish
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            onFinish()
+        }
+    }
+
+    private func emitModernSparkles() {
+        let center = CGPoint(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2 - 50)
+        for i in 0..<12 {
+            let angle = Double(i) * (.pi * 2 / 12)
+            let s = ModernSparkle(
+                id: i,
+                x: center.x,
+                y: center.y,
+                size: CGFloat.random(in: 10...20),
+                opacity: 0
+            )
+            sparkles.append(s)
+            
+            withAnimation(.interpolatingSpring(stiffness: 50, damping: 5).delay(Double(i) * 0.02)) {
+                sparkles[i].x += cos(angle) * 150
+                sparkles[i].y += sin(angle) * 150
+                sparkles[i].opacity = 0.8
             }
         }
     }
 }
 
-struct AnimatedBook: View {
-    let openAmount: CGFloat
+// MARK: - Components
+
+struct ModernSplashCard: View {
+    let character: String
+    let subtitle: String
+    let color: Color
+    let rotation: Double
+    let xOffset: CGFloat
+    let scale: CGFloat
 
     var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            let coverW = w * 0.48
-            let coverH = h * 0.88
-            let spineW: CGFloat = 4
-            let angle = Double(openAmount) * 85
+        VStack(spacing: 8) {
+            Text(character)
+                .font(.system(size: 34, weight: .heavy, design: .rounded))
+                .foregroundStyle(.white)
+            Text(subtitle)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.white.opacity(0.65))
+        }
+        .frame(width: 130, height: 175)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(color.gradient)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(.white.opacity(0.2), lineWidth: 1)
+                )
+        )
+        .shadow(color: color.opacity(0.3), radius: 15, x: 0, y: 10)
+        .rotationEffect(.degrees(rotation))
+        .offset(x: xOffset)
+        .scaleEffect(scale)
+    }
+}
 
-            ZStack {
-                // Spine — gáy sách ở giữa
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(.white.opacity(0.9))
-                    .frame(width: spineW, height: coverH)
-                    .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 1)
+struct ModernFlipCard: View {
+    let isFlipped: Bool
+    let appeared: Bool
 
-                // Bìa trái — xoay quanh mép phải (gáy)
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(.white)
-                    .frame(width: coverW, height: coverH)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.white.opacity(0.6), lineWidth: 1)
-                            .blur(radius: 0.5)
-                    )
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: -2, y: 2)
-                    .overlay(alignment: .trailing) {
-                        Rectangle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [.clear, .black.opacity(0.08)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: 12)
-                            .mask(RoundedRectangle(cornerRadius: 6))
-                    }
-                    .rotation3DEffect(.degrees(-angle), axis: (x: 0, y: 1, z: 0), anchor: .trailing, perspective: 0.4)
-                    .offset(x: -spineW / 2)
-
-                // Bìa phải — xoay quanh mép trái (gáy)
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(.white)
-                    .frame(width: coverW, height: coverH)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.white.opacity(0.6), lineWidth: 1)
-                            .blur(radius: 0.5)
-                    )
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 2, y: 2)
-                    .overlay(alignment: .leading) {
-                        Rectangle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [.black.opacity(0.08), .clear],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: 12)
-                            .mask(RoundedRectangle(cornerRadius: 6))
-                    }
-                    .rotation3DEffect(.degrees(angle), axis: (x: 0, y: 1, z: 0), anchor: .leading, perspective: 0.4)
-                    .offset(x: spineW / 2)
+    var body: some View {
+        ZStack {
+            // Front face - "学 · A" (Chinese + English combined)
+            VStack(spacing: 6) {
+                Text("学")
+                    .font(.system(size: 38, weight: .heavy))
+                    .foregroundStyle(.white)
+                Text("learn")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.65))
             }
-            .frame(width: w, height: h)
+            .frame(width: 130, height: 175)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(AppTheme.primary.gradient)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(.white.opacity(0.2), lineWidth: 1)
+                    )
+            )
+            .shadow(color: AppTheme.primary.opacity(0.3), radius: 15, x: 0, y: 10)
+            .scaleEffect(appeared ? 1.05 : 0.5)
+            .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+            .opacity(isFlipped ? 0 : 1)
+
+            // Back face - Clean checkmark only
+            Image(systemName: "checkmark")
+                .font(.system(size: 48, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 130, height: 175)
+                .background(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .fill(AppTheme.accentGreen.gradient)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                .stroke(.white.opacity(0.3), lineWidth: 1)
+                        )
+                )
+                .shadow(color: AppTheme.accentGreen.opacity(0.4), radius: 20, x: 0, y: 10)
+                .scaleEffect(appeared ? 1.05 : 0.5)
+                .rotation3DEffect(.degrees(isFlipped ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+                .opacity(isFlipped ? 1 : 0)
         }
     }
 }
 
-/// Chim én — silhouette với đuôi chẻ đặc trưng (forked tail), cánh dang rộng khi bay
-struct SwallowShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-        let cx = h * 0.5
+struct ModernSparkle: Identifiable {
+    let id: Int
+    var x: CGFloat
+    var y: CGFloat
+    var size: CGFloat
+    var opacity: Double
+}
 
-        // Silhouette liền mạch: đầu → thân → đuôi chẻ + cánh
-        // Đầu nhỏ phía trước
-        path.move(to: CGPoint(x: w * 0.08, y: cx))
-        path.addQuadCurve(to: CGPoint(x: w * 0.2, y: cx - h * 0.08), control: CGPoint(x: w * 0.1, y: cx - h * 0.12))
-        path.addQuadCurve(to: CGPoint(x: w * 0.35, y: cx), control: CGPoint(x: w * 0.28, y: cx - h * 0.12))
-
-        // Thân + cánh trái (phía trên)
-        path.addQuadCurve(to: CGPoint(x: w * 0.5, y: cx - h * 0.45), control: CGPoint(x: w * 0.38, y: cx - h * 0.5))
-        path.addLine(to: CGPoint(x: w * 0.72, y: cx - h * 0.15))
-        path.addQuadCurve(to: CGPoint(x: w * 0.78, y: cx), control: CGPoint(x: w * 0.76, y: cx - h * 0.08))
-
-        // Đuôi chẻ — nhánh trên
-        path.addLine(to: CGPoint(x: w * 0.98, y: cx - h * 0.38))
-        path.addLine(to: CGPoint(x: w * 0.85, y: cx))
-        path.addLine(to: CGPoint(x: w * 0.78, y: cx))
-
-        // Đuôi chẻ — nhánh dưới
-        path.addLine(to: CGPoint(x: w * 0.98, y: cx + h * 0.38))
-        path.addLine(to: CGPoint(x: w * 0.72, y: cx + h * 0.15))
-
-        // Cánh phải (phía dưới)
-        path.addQuadCurve(to: CGPoint(x: w * 0.5, y: cx + h * 0.45), control: CGPoint(x: w * 0.38, y: cx + h * 0.5))
-        path.addQuadCurve(to: CGPoint(x: w * 0.08, y: cx), control: CGPoint(x: w * 0.28, y: cx + h * 0.12))
-
-        path.closeSubpath()
-        return path
-    }
+#Preview {
+    SplashScreen(onFinish: {})
 }

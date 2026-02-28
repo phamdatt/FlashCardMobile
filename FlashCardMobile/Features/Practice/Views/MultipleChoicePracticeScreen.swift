@@ -18,6 +18,8 @@ struct MultipleChoicePracticeScreen: View {
     @State private var score = 0
     @State private var totalAnswered = 0
     @State private var showResult = false
+    @State private var showSettings = false
+    @State private var phoneticRevealed = false
     @AppStorage("practice_show_pinyin") private var showPinyin = true
 
     var body: some View {
@@ -55,6 +57,8 @@ struct MultipleChoicePracticeScreen: View {
             PracticeResultSheet(
                 score: score,
                 total: totalAnswered,
+                practiceType: "Trắc nghiệm",
+                topicId: topic.id,
                 onDismiss: {
                     showResult = false
                     dismiss()
@@ -64,45 +68,38 @@ struct MultipleChoicePracticeScreen: View {
     }
 
     private var progressBar: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Button {
-                    HapticFeedback.impact()
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(AppTheme.textSecondary)
-                }
-                Spacer()
-                Text("\(currentIndex + 1) / \(cards.count)")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+        HStack {
+            Button {
+                HapticFeedback.impact()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(AppTheme.textSecondary)
-                Spacer()
             }
-            HStack {
-                Label("Pinyin", systemImage: "textformat.phonetic")
-                    .font(.subheadline)
+            Spacer()
+            Text("\(currentIndex + 1) / \(cards.count)")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(AppTheme.textSecondary)
+            Spacer()
+            Button { showSettings = true } label: {
+                Image(systemName: "gearshape")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(AppTheme.textSecondary)
-                Spacer()
-                Toggle("", isOn: $showPinyin)
-                    .labelsHidden()
-                    .tint(AppTheme.primary)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(AppTheme.cardBg)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .sheet(isPresented: $showSettings) {
+                PracticeSettingsDrawer()
+            }
         }
         .padding()
     }
 
     private var emptyState: some View {
         ContentUnavailableView(
-            "Không có thẻ",
+            L("practice.no_cards"),
             systemImage: "rectangle.stack",
-            description: Text("Cần ít nhất 4 từ để luyện trắc nghiệm.")
+            description: Text(L("mc.min_words"))
         )
     }
 
@@ -113,22 +110,35 @@ struct MultipleChoicePracticeScreen: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-            if showPinyin, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
+            if showPinyin || phoneticRevealed, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
                 Text(phonetic)
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
+            }
+            if !showPinyin, !phoneticRevealed, card.displayPhonetic != nil {
+                Image(systemName: "hand.tap")
+                    .font(.caption2)
+                    .foregroundStyle(AppTheme.textSecondary.opacity(0.4))
             }
         }
         .frame(maxWidth: .infinity)
         .padding(32)
         .cardStyle()
+        .onTapGesture {
+            if !showPinyin {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    phoneticRevealed.toggle()
+                }
+            }
+        }
     }
 
     private var feedbackBanner: some View {
         HStack {
             Image(systemName: lastCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
-            Text(lastCorrect ? "Đúng rồi!" : "Sai rồi - Đáp án: \(cards[currentIndex].answer)")
+            Text(lastCorrect ? L("practice.correct") : L("practice.wrong_alt", cards[currentIndex].answer))
                 .font(.subheadline)
                 .fontWeight(.medium)
                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
@@ -148,10 +158,11 @@ struct MultipleChoicePracticeScreen: View {
                 currentIndex += 1
                 selectedOption = nil
                 showFeedback = false
+                phoneticRevealed = false
             }
         } label: {
             HStack(spacing: 8) {
-                Text("Tiếp tục")
+                Text(L("common.continue"))
                 Image(systemName: "arrow.right")
                     .font(.body.weight(.semibold))
             }
@@ -183,6 +194,7 @@ struct MultipleChoicePracticeScreen: View {
                     showFeedback = true
                     totalAnswered += 1
                     if correct { score += 1 }
+                    if correct { SoundEffect.playCorrect() } else { SoundEffect.playWrong() }
 
                     DatabaseManager.shared.ensureProgressExists(flashcardId: card.id)
                     if var progress = DatabaseManager.shared.getFlashcardProgress(flashcardId: card.id) {
@@ -195,15 +207,6 @@ struct MultipleChoicePracticeScreen: View {
                         DatabaseManager.shared.saveFlashcardProgress(progress)
                     }
 
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "yyyy-MM-dd"
-                    DatabaseManager.shared.recordPracticeSession(
-                        practiceDate: formatter.string(from: Date()),
-                        practiceType: "Trắc nghiệm",
-                        topicId: topic.id,
-                        correct: correct ? 1 : 0,
-                        total: 1
-                    )
                 }
             }
         }

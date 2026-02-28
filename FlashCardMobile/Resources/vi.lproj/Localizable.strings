@@ -1,0 +1,263 @@
+/* Common */
+"common.save" = "Lưu";
+"common.cancel" = "Hủy";
+"common.delete" = "Xóa";
+"common.close" = "Đóng";
+"common.continue" = "Tiếp tục";
+"common.edit" = "Sửa";
+"common.open" = "Mở";
+"common.copy" = "Sao chép";
+"common.start" = "Bắt đầu";
+"common.skip" = "Bỏ qua";
+"common.next" = "Tiếp theo";
+"common.done" = "Hoàn thành!";
+"common.view" = "Xem";
+"common.check" = "Kiểm tra";
+"common.words" = "từ";
+"common.lessons" = "bài";
+"common.days" = "ngày";
+"common.error" = "Lỗi";
+"common.all" = "Tất cả";
+"common.unknown_error" = "Không xác định";
+
+/* Tabs */
+"tab.learn" = "Học";
+"tab.review" = "Ôn tập";
+"tab.search" = "Tìm kiếm";
+"tab.statistics" = "Thống kê";
+"tab.settings" = "Cài đặt";
+
+/* Subjects */
+"subject.english" = "Tiếng Anh";
+"subject.chinese" = "Tiếng Trung";
+"subject.reading" = "Bài đọc";
+"subjects.title" = "Học tập";
+"subjects.topics_count" = "chủ đề";
+
+/* Topics */
+"topics.search_placeholder" = "Tìm chủ đề";
+"topics.add_title" = "Thêm chủ đề";
+"topics.edit_title" = "Sửa chủ đề";
+"topics.name_placeholder" = "Tên chủ đề";
+"topics.delete_title" = "Xóa chủ đề?";
+"topics.delete_message" = "Chủ đề \"%@\" và tất cả từ vựng sẽ bị xóa vĩnh viễn.";
+"topics.practice_all" = "Luyện tập tất cả";
+"topics.practice_all_subtitle" = "Ôn tập toàn bộ %@";
+"topics.more_words" = "+ %d từ khác...";
+
+/* Flashcards */
+"flashcard.add_title" = "Thêm từ vựng";
+"flashcard.edit_title" = "Sửa từ vựng";
+"flashcard.delete_title" = "Xóa từ vựng?";
+"flashcard.delete_message" = "Từ \"%@\" sẽ bị xóa vĩnh viễn.";
+"flashcard.question_placeholder" = "Câu hỏi / Hán tự";
+"flashcard.answer_placeholder" = "Đáp án / Nghĩa";
+"flashcard.hint_placeholder" = "Gợi ý";
+"flashcard.phonetic_placeholder" = "Phiên âm / Pinyin";
+"flashcard.radical_placeholder" = "Bộ thủ";
+"flashcard.notes_placeholder" = "Ghi chú";
+"flashcard.section_vocab" = "Từ vựng";
+"flashcard.section_extra" = "Thông tin bổ sung";
+"flashcard.start_practice" = "Bắt đầu luyện tập";
+"flashcard.view_detail" = "Xem chi tiết";
+"flashcard.export_csv" = "Xuất CSV";
+"flashcard.import_csv" = "Nhập CSV";
+"flashcard.add_vocab" = "Thêm từ vựng";
+
+/* Flashcard Detail */
+"detail.title" = "Chi tiết";
+"detail.phonetic" = "Phiên âm";
+"detail.meaning" = "Nghĩa";
+"detail.hint" = "Gợi ý";
+"detail.radical" = "Bộ thủ";
+"detail.radical_label" = "Bộ:";
+"detail.notes" = "Ghi chú";
+"detail.copy" = "Sao chép từ vựng";
+"detail.practice_similar" = "Luyện từ tương tự";
+"detail.practice_similar_subtitle" = "Phân biệt hán tự & pinyin giống nhau";
+"detail.speaking" = "Đang phát...";
+"detail.listen" = "Nghe phát âm";
+"detail.extra_info" = "Thông tin thêm";
+
+/* Practice Common */
+"practice.choose_type" = "Chọn kiểu luyện tập";
+"practice.no_cards" = "Không có thẻ";
+"practice.correct" = "Đúng rồi!";
+"practice.wrong_answer" = "Sai - Đáp án: %@";
+"practice.wrong_alt" = "Sai rồi - Đáp án: %@";
+"practice.score" = "%d/%d đúng (%d%%)";
+"practice.settings" = "Cài đặt";
+"practice.show_pinyin" = "Hiện Pinyin";
+"practice.sound_toggle" = "Âm thanh";
+"practice.loading" = "Đang tải từ vựng...";
+"practice.practice" = "Luyện tập";
+"practice.practice_all" = "Luyện tập tất cả";
+"practice.all_subject" = "Tất cả %@";
+"practice.word_count" = "từ trong kho từ vựng";
+"practice.word_quantity" = "Số lượng từ";
+"practice.shuffle_desc" = "Sẽ trộn ngẫu nhiên %d từ để luyện tập";
+
+/* Practice Types */
+"practice_type.flip_card" = "Thẻ lật";
+"practice_type.multiple_choice" = "Trắc nghiệm";
+"practice_type.listening" = "Nghe → chọn";
+"practice_type.meaning_to_hanzi" = "Nghĩa → Hán tự";
+"practice_type.similar_vocab" = "Từ tương tự";
+"practice_type.flip_desc" = "Lật thẻ để nhớ từ";
+"practice_type.mc_desc" = "Chọn đáp án đúng";
+"practice_type.listen_desc" = "Nghe và nhận diện từ";
+"practice_type.hanzi_desc" = "Viết hán tự từ nghĩa";
+
+/* Multiple Choice */
+"mc.min_words" = "Cần ít nhất 4 từ để luyện trắc nghiệm.";
+
+/* Flip Card */
+"flip.no_vocab" = "Chủ đề này chưa có từ vựng để luyện tập.";
+
+/* Listening */
+"listening.no_vocab" = "Chủ đề này chưa có từ để luyện nghe.";
+"listening.instruction" = "Nghe và chọn nghĩa đúng";
+"listening.playing" = "Đang phát...";
+"listening.play" = "Phát âm";
+
+/* Meaning to Hanzi */
+"hanzi.no_vocab" = "Chủ đề này chưa có từ để luyện Nghĩa → Hán tự.";
+"hanzi.instruction" = "Ý nghĩa (viết hán tự):";
+"hanzi.your_answer" = "Hán tự của bạn:";
+"hanzi.placeholder" = "Ví dụ: 你好";
+"hanzi.correct" = "Chính xác!";
+"hanzi.wrong" = "Chưa đúng";
+"hanzi.correct_answer" = "Hán tự đúng: %@";
+
+/* Similar Vocab */
+"similar.loading" = "Đang tìm từ tương tự...";
+"similar.not_found" = "Không tìm thấy từ tương tự";
+"similar.not_found_desc" = "Không có từ vựng nào tương tự về hán tự hoặc pinyin.";
+"similar.banner" = "Từ tương tự với: %@";
+"similar.compare" = "So sánh";
+"similar.same_pinyin" = "Cùng pinyin";
+"similar.similar_pinyin" = "Pinyin giống";
+"similar.similar_char" = "Chữ giống";
+"similar.shared_component" = "Cùng bộ thủ";
+
+/* Review */
+"review.title" = "Ôn tập";
+"review.streak_days" = "%d ngày";
+"review.due_count" = "%d cần ôn";
+"review.srs_title" = "Ôn tập theo lịch";
+"review.srs_due" = "%d thẻ cần ôn";
+"review.srs_done" = "Đã ôn xong!";
+"review.srs_subtitle" = "Luyện theo hệ thống SRS";
+"review.daily_title" = "Luyện tập mỗi ngày";
+"review.daily_words" = "20 từ ngẫu nhiên";
+"review.daily_subtitle" = "Trắc nghiệm từ vựng random mỗi ngày";
+"review.mistakes_title" = "Từ hay sai";
+"review.no_mistakes" = "Chưa có từ nào sai gần đây. Hãy tiếp tục luyện tập!";
+"review.mistakes_count" = "%d từ cần luyện lại";
+"review.mistakes_subtitle" = "Ôn lại những từ hay trả lời sai";
+"review.complete_title" = "Hoàn thành!";
+"review.complete_message" = "Bạn đã ôn hết thẻ hôm nay";
+"review.tap_continue" = "Chạm để tiếp";
+"review.tap_reveal" = "Chạm để xem đáp án";
+"review.no_vocab" = "Chưa có từ vựng";
+"review.no_vocab_desc" = "Hãy thêm từ vựng trước khi luyện tập.";
+"review.no_mistakes_title" = "Không có từ sai";
+"review.no_mistakes_desc" = "Bạn chưa trả lời sai từ nào gần đây.";
+"review.random_daily" = "Random hàng ngày";
+"review.mistakes_type" = "Từ hay sai";
+
+/* Statistics */
+"stats.title" = "Thống kê";
+"stats.record" = "Kỷ lục";
+"stats.progress" = "Tiến độ học tập";
+"stats.mastered" = "Đã thuộc";
+"stats.learning" = "Đang học";
+"stats.new" = "Chưa học";
+"stats.mastered_label" = "đã thuộc";
+"stats.frequently_wrong" = "Hay sai";
+"stats.overview" = "Tổng quan";
+"stats.total_words" = "Tổng từ";
+"stats.due_review" = "Cần ôn";
+"stats.by_subject" = "Theo môn học";
+"stats.no_mastered" = "Chưa có từ nào thuộc";
+"stats.no_mastered_desc" = "Tiếp tục luyện tập để thuộc từ vựng!";
+"stats.mastered_title" = "Từ đã thuộc (%d)";
+"stats.no_wrong" = "Không có từ hay sai";
+"stats.no_wrong_desc" = "Bạn đang làm rất tốt!";
+"stats.wrong_title" = "Từ hay sai";
+"stats.wrong_count" = "sai %dx";
+"stats.words_topics" = "%d từ \u{2022} %d chủ đề";
+
+/* Settings */
+"settings.title" = "Cài đặt";
+"settings.backup_title" = "Sao lưu & Xuất SQLite";
+"settings.data_section" = "Dữ liệu";
+"settings.data_footer" = "Sao lưu, xuất hoặc khôi phục database.";
+"settings.appearance" = "Giao diện";
+"settings.appearance_section" = "Chế độ hiển thị";
+"settings.appearance_footer" = "Chọn Sáng hoặc Tối để cố định, hoặc Hệ thống để theo cài đặt thiết bị.";
+"settings.language" = "Ngôn ngữ";
+"settings.language_section" = "Ngôn ngữ";
+
+/* Appearance */
+"appearance.system" = "Hệ thống";
+"appearance.light" = "Sáng";
+"appearance.dark" = "Tối";
+
+/* Search */
+"search.title" = "Tìm từ vựng";
+"search.placeholder" = "Tìm theo từ, nghĩa, gợi ý...";
+"search.empty_title" = "Tìm từ vựng";
+"search.empty_desc" = "Nhập từ khóa để tìm theo câu hỏi, đáp án, gợi ý hoặc phiên âm";
+
+/* Onboarding */
+"onboarding.page1_title" = "Học từ vựng theo chủ đề";
+"onboarding.page1_desc" = "Chọn môn học và chủ đề để bắt đầu học từ vựng. Hỗ trợ Tiếng Anh, Tiếng Trung và Bài đọc.";
+"onboarding.page2_title" = "Nhiều kiểu luyện tập";
+"onboarding.page2_desc" = "Thẻ lật, trắc nghiệm, nghe chọn đáp án. Tiếng Trung còn có luyện Nghĩa → Hán tự.";
+"onboarding.page3_title" = "Ôn tập theo lịch SRS";
+"onboarding.page3_desc" = "Hệ thống tự nhắc bạn ôn lại từ vựng đúng thời điểm để ghi nhớ lâu hơn.";
+"onboarding.page4_title" = "Theo dõi tiến độ";
+"onboarding.page4_desc" = "Xem streak, thống kê học tập và theo dõi sự tiến bộ của bạn.";
+
+/* Splash */
+"splash.subtitle" = "Học từ vựng hiệu quả";
+"splash.bravo" = "Giỏi!";
+
+/* CSV */
+"csv.export_title" = "Xuất từ vựng ra CSV";
+"csv.export_topic" = "Chủ đề: %@";
+"csv.export_action" = "Xuất và chia sẻ";
+"csv.export_nav" = "Xuất CSV";
+"csv.export_error" = "Lỗi xuất CSV";
+"csv.no_data" = "Không có dữ liệu để xuất.";
+"csv.import_title" = "Nhập từ vựng từ CSV";
+"csv.import_topic" = "Chủ đề: %@";
+"csv.import_success" = "Đã nhập %d từ vựng";
+"csv.import_errors" = "%d lỗi";
+"csv.import_pick" = "Chọn file CSV";
+
+/* Backup */
+"backup.save_sqlite" = "Sao lưu SQLite";
+"backup.export_sqlite" = "Xuất SQLite";
+"backup.restore" = "Khôi phục từ backup";
+"backup.title" = "Sao lưu & Khôi phục";
+"backup.footer" = "Sao lưu lưu vào Files > FlashCardMobile > Backups. Xuất SQLite chia sẻ file qua iCloud, AirDrop, v.v.";
+"backup.data_section" = "Sao lưu dữ liệu";
+"backup.restore_error" = "Không thể khôi phục file.";
+"backup.saved_title" = "Đã sao lưu";
+"backup.saved_message" = "Đã lưu vào:\n%@\n\nMở Files > FlashCardMobile > Backups để xem.";
+"backup.save_error" = "Không thể sao lưu database.";
+"backup.export_error" = "Không thể tạo file xuất.";
+"backup.success_default" = "Sao lưu thành công.";
+
+/* Errors */
+"csv.create_error" = "Không thể tạo file: %@";
+
+/* Reading */
+"reading.empty" = "Chưa có bài đọc";
+"reading.empty_desc" = "Chủ đề này chưa có bài đọc nào.";
+"reading.title" = "Bài đọc";
+
+/* Speech */
+"speech.no_voice" = "Chưa có giọng đọc. Vào Cài đặt → Trợ năng → Nội dung đọc để tải giọng.";

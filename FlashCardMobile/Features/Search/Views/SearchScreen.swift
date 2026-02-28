@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct SearchResultItem: Identifiable, Hashable {
     let id: Int
@@ -16,11 +17,9 @@ struct SearchScreen: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var searchText = ""
     @State private var selectedItem: SearchResultItem?
-    @State private var results: [(Flashcard, Topic, Subject)] = []
-
-    private var resultItems: [SearchResultItem] {
-        results.map { SearchResultItem(id: $0.0.id, flashcard: $0.0, topic: $0.1, subject: $0.2) }
-    }
+    @State private var resultItems: [SearchResultItem] = []
+    @State private var isSearching = false
+    @State private var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -30,7 +29,10 @@ struct SearchScreen: View {
 
                 if searchText.isEmpty {
                     emptyState
-                } else if results.isEmpty {
+                } else if isSearching {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if resultItems.isEmpty {
                     noResultsState
                 } else {
                     resultsList
@@ -40,7 +42,28 @@ struct SearchScreen: View {
             .navigationBarTitleDisplayMode(.large)
             .searchable(text: $searchText, prompt: "Tìm theo từ, nghĩa, gợi ý...")
             .onChange(of: searchText) { _, newValue in
-                performSearch(query: newValue)
+                searchTask?.cancel()
+                let query = newValue.trimmingCharacters(in: .whitespaces)
+                if query.isEmpty {
+                    resultItems = []
+                    isSearching = false
+                    return
+                }
+                isSearching = true
+                searchTask = Task {
+                    try? await Task.sleep(for: .milliseconds(300))
+                    guard !Task.isCancelled else { return }
+                    let results = await Task.detached {
+                        DatabaseManager.shared.searchFlashcards(query: query)
+                    }.value
+                    guard !Task.isCancelled else { return }
+                    await MainActor.run {
+                        resultItems = results.map {
+                            SearchResultItem(id: $0.0.id, flashcard: $0.0, topic: $0.1, subject: $0.2)
+                        }
+                        isSearching = false
+                    }
+                }
             }
             .navigationDestination(item: $selectedItem) { item in
                 if let subject = viewModel.subjects.first(where: { $0.id == item.subject.id }),
@@ -84,15 +107,6 @@ struct SearchScreen: View {
                 }
             }
             .padding()
-        }
-    }
-
-    private func performSearch(query: String) {
-        let q = query.trimmingCharacters(in: .whitespaces)
-        if q.isEmpty {
-            results = []
-        } else {
-            results = DatabaseManager.shared.searchFlashcards(query: q)
         }
     }
 }

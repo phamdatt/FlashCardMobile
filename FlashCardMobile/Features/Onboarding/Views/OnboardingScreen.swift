@@ -16,28 +16,30 @@ struct OnboardingScreen: View {
     let onFinish: () -> Void
     @State private var currentPage = 0
 
-    private let pages: [OnboardingPage] = [
-        OnboardingPage(
-            icon: "book.fill",
-            title: "Học từ vựng theo chủ đề",
-            description: "Chọn môn học và chủ đề để bắt đầu học từ vựng. Hỗ trợ Tiếng Anh, Tiếng Trung và Bài đọc."
-        ),
-        OnboardingPage(
-            icon: "play.circle.fill",
-            title: "Nhiều kiểu luyện tập",
-            description: "Thẻ lật, trắc nghiệm, nghe chọn đáp án. Tiếng Trung còn có luyện Nghĩa → Hán tự."
-        ),
-        OnboardingPage(
-            icon: "arrow.clockwise.circle.fill",
-            title: "Ôn tập theo lịch SRS",
-            description: "Hệ thống tự nhắc bạn ôn lại từ vựng đúng thời điểm để ghi nhớ lâu hơn."
-        ),
-        OnboardingPage(
-            icon: "chart.bar.fill",
-            title: "Theo dõi tiến độ",
-            description: "Xem streak, thống kê học tập và theo dõi sự tiến bộ của bạn."
-        )
-    ]
+    private var pages: [OnboardingPage] {
+        [
+            OnboardingPage(
+                icon: "book.fill",
+                title: L("onboarding.page1_title"),
+                description: L("onboarding.page1_desc")
+            ),
+            OnboardingPage(
+                icon: "play.circle.fill",
+                title: L("onboarding.page2_title"),
+                description: L("onboarding.page2_desc")
+            ),
+            OnboardingPage(
+                icon: "arrow.clockwise.circle.fill",
+                title: L("onboarding.page3_title"),
+                description: L("onboarding.page3_desc")
+            ),
+            OnboardingPage(
+                icon: "chart.bar.fill",
+                title: L("onboarding.page4_title"),
+                description: L("onboarding.page4_desc")
+            )
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -107,7 +109,7 @@ struct OnboardingScreen: View {
                     withAnimation { currentPage += 1 }
                 }
             } label: {
-                Text(currentPage == pages.count - 1 ? "Bắt đầu" : "Tiếp theo")
+                Text(currentPage == pages.count - 1 ? L("common.start") : L("common.next"))
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -122,7 +124,7 @@ struct OnboardingScreen: View {
                     HapticFeedback.impact()
                     onFinish()
                 } label: {
-                    Text("Bỏ qua")
+                    Text(L("common.skip"))
                         .font(.subheadline)
                         .foregroundStyle(AppTheme.textSecondary)
                 }

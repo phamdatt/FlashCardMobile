@@ -1,0 +1,263 @@
+/* Common */
+"common.save" = "Save";
+"common.cancel" = "Cancel";
+"common.delete" = "Delete";
+"common.close" = "Close";
+"common.continue" = "Continue";
+"common.edit" = "Edit";
+"common.open" = "Open";
+"common.copy" = "Copy";
+"common.start" = "Start";
+"common.skip" = "Skip";
+"common.next" = "Next";
+"common.done" = "Done!";
+"common.view" = "View";
+"common.check" = "Check";
+"common.words" = "words";
+"common.lessons" = "lessons";
+"common.days" = "days";
+"common.error" = "Error";
+"common.all" = "All";
+"common.unknown_error" = "Unknown error";
+
+/* Tabs */
+"tab.learn" = "Learn";
+"tab.review" = "Review";
+"tab.search" = "Search";
+"tab.statistics" = "Statistics";
+"tab.settings" = "Settings";
+
+/* Subjects */
+"subject.english" = "English";
+"subject.chinese" = "Chinese";
+"subject.reading" = "Reading";
+"subjects.title" = "Learning";
+"subjects.topics_count" = "topics";
+
+/* Topics */
+"topics.search_placeholder" = "Search topics";
+"topics.add_title" = "Add Topic";
+"topics.edit_title" = "Edit Topic";
+"topics.name_placeholder" = "Topic name";
+"topics.delete_title" = "Delete topic?";
+"topics.delete_message" = "Topic \"%@\" and all its vocabulary will be permanently deleted.";
+"topics.practice_all" = "Practice All";
+"topics.practice_all_subtitle" = "Review all %@";
+"topics.more_words" = "+ %d more words...";
+
+/* Flashcards */
+"flashcard.add_title" = "Add Vocabulary";
+"flashcard.edit_title" = "Edit Vocabulary";
+"flashcard.delete_title" = "Delete vocabulary?";
+"flashcard.delete_message" = "The word \"%@\" will be permanently deleted.";
+"flashcard.question_placeholder" = "Question / Hanzi";
+"flashcard.answer_placeholder" = "Answer / Meaning";
+"flashcard.hint_placeholder" = "Hint";
+"flashcard.phonetic_placeholder" = "Phonetic / Pinyin";
+"flashcard.radical_placeholder" = "Radical";
+"flashcard.notes_placeholder" = "Notes";
+"flashcard.section_vocab" = "Vocabulary";
+"flashcard.section_extra" = "Additional Info";
+"flashcard.start_practice" = "Start Practice";
+"flashcard.view_detail" = "View Details";
+"flashcard.export_csv" = "Export CSV";
+"flashcard.import_csv" = "Import CSV";
+"flashcard.add_vocab" = "Add Vocabulary";
+
+/* Flashcard Detail */
+"detail.title" = "Details";
+"detail.phonetic" = "Phonetic";
+"detail.meaning" = "Meaning";
+"detail.hint" = "Hint";
+"detail.radical" = "Radical";
+"detail.radical_label" = "Radical:";
+"detail.notes" = "Notes";
+"detail.copy" = "Copy Vocabulary";
+"detail.practice_similar" = "Practice Similar";
+"detail.practice_similar_subtitle" = "Distinguish similar hanzi & pinyin";
+"detail.speaking" = "Playing...";
+"detail.listen" = "Listen";
+"detail.extra_info" = "More Info";
+
+/* Practice Common */
+"practice.choose_type" = "Choose Practice Type";
+"practice.no_cards" = "No Cards";
+"practice.correct" = "Correct!";
+"practice.wrong_answer" = "Wrong - Answer: %@";
+"practice.wrong_alt" = "Wrong - Answer: %@";
+"practice.score" = "%d/%d correct (%d%%)";
+"practice.settings" = "Settings";
+"practice.show_pinyin" = "Show Pinyin";
+"practice.sound_toggle" = "Sound";
+"practice.loading" = "Loading vocabulary...";
+"practice.practice" = "Practice";
+"practice.practice_all" = "Practice All";
+"practice.all_subject" = "All %@";
+"practice.word_count" = "words in vocabulary";
+"practice.word_quantity" = "Word count";
+"practice.shuffle_desc" = "Will shuffle %d words for practice";
+
+/* Practice Types */
+"practice_type.flip_card" = "Flip Card";
+"practice_type.multiple_choice" = "Multiple Choice";
+"practice_type.listening" = "Listen & Choose";
+"practice_type.meaning_to_hanzi" = "Meaning → Hanzi";
+"practice_type.similar_vocab" = "Similar Vocab";
+"practice_type.flip_desc" = "Flip cards to memorize";
+"practice_type.mc_desc" = "Choose the correct answer";
+"practice_type.listen_desc" = "Listen and identify words";
+"practice_type.hanzi_desc" = "Write hanzi from meaning";
+
+/* Multiple Choice */
+"mc.min_words" = "Need at least 4 words for multiple choice.";
+
+/* Flip Card */
+"flip.no_vocab" = "This topic has no vocabulary to practice.";
+
+/* Listening */
+"listening.no_vocab" = "This topic has no words for listening practice.";
+"listening.instruction" = "Listen and choose the correct meaning";
+"listening.playing" = "Playing...";
+"listening.play" = "Play";
+
+/* Meaning to Hanzi */
+"hanzi.no_vocab" = "This topic has no words for Meaning → Hanzi practice.";
+"hanzi.instruction" = "Meaning (write hanzi):";
+"hanzi.your_answer" = "Your hanzi:";
+"hanzi.placeholder" = "e.g. 你好";
+"hanzi.correct" = "Correct!";
+"hanzi.wrong" = "Incorrect";
+"hanzi.correct_answer" = "Correct hanzi: %@";
+
+/* Similar Vocab */
+"similar.loading" = "Finding similar words...";
+"similar.not_found" = "No similar words found";
+"similar.not_found_desc" = "No vocabulary with similar hanzi or pinyin found.";
+"similar.banner" = "Similar to: %@";
+"similar.compare" = "Compare";
+"similar.same_pinyin" = "Same pinyin";
+"similar.similar_pinyin" = "Similar pinyin";
+"similar.similar_char" = "Similar char";
+"similar.shared_component" = "Shared component";
+
+/* Review */
+"review.title" = "Review";
+"review.streak_days" = "%d days";
+"review.due_count" = "%d due";
+"review.srs_title" = "Scheduled Review";
+"review.srs_due" = "%d cards due";
+"review.srs_done" = "All done!";
+"review.srs_subtitle" = "Practice with SRS system";
+"review.daily_title" = "Daily Practice";
+"review.daily_words" = "20 random words";
+"review.daily_subtitle" = "Daily random vocabulary quiz";
+"review.mistakes_title" = "Frequently Wrong";
+"review.no_mistakes" = "No recent mistakes. Keep practicing!";
+"review.mistakes_count" = "%d words to review";
+"review.mistakes_subtitle" = "Review frequently wrong answers";
+"review.complete_title" = "Complete!";
+"review.complete_message" = "You've reviewed all cards for today";
+"review.tap_continue" = "Tap to continue";
+"review.tap_reveal" = "Tap to reveal answer";
+"review.no_vocab" = "No vocabulary";
+"review.no_vocab_desc" = "Add vocabulary before practicing.";
+"review.no_mistakes_title" = "No wrong answers";
+"review.no_mistakes_desc" = "You haven't gotten any wrong recently.";
+"review.random_daily" = "Daily Random";
+"review.mistakes_type" = "Frequently Wrong";
+
+/* Statistics */
+"stats.title" = "Statistics";
+"stats.record" = "Record";
+"stats.progress" = "Learning Progress";
+"stats.mastered" = "Mastered";
+"stats.learning" = "Learning";
+"stats.new" = "New";
+"stats.mastered_label" = "mastered";
+"stats.frequently_wrong" = "Often Wrong";
+"stats.overview" = "Overview";
+"stats.total_words" = "Total";
+"stats.due_review" = "Due";
+"stats.by_subject" = "By Subject";
+"stats.no_mastered" = "No mastered words yet";
+"stats.no_mastered_desc" = "Keep practicing to master vocabulary!";
+"stats.mastered_title" = "Mastered Words (%d)";
+"stats.no_wrong" = "No frequently wrong words";
+"stats.no_wrong_desc" = "You're doing great!";
+"stats.wrong_title" = "Frequently Wrong";
+"stats.wrong_count" = "wrong %dx";
+"stats.words_topics" = "%d words \u{2022} %d topics";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.backup_title" = "Backup & Export SQLite";
+"settings.data_section" = "Data";
+"settings.data_footer" = "Backup, export, or restore database.";
+"settings.appearance" = "Appearance";
+"settings.appearance_section" = "Display Mode";
+"settings.appearance_footer" = "Choose Light or Dark to lock, or System to follow device settings.";
+"settings.language" = "Language";
+"settings.language_section" = "Language";
+
+/* Appearance */
+"appearance.system" = "System";
+"appearance.light" = "Light";
+"appearance.dark" = "Dark";
+
+/* Search */
+"search.title" = "Search Vocabulary";
+"search.placeholder" = "Search by word, meaning, hint...";
+"search.empty_title" = "Search Vocabulary";
+"search.empty_desc" = "Enter a keyword to search by question, answer, hint, or phonetic";
+
+/* Onboarding */
+"onboarding.page1_title" = "Learn Vocabulary by Topic";
+"onboarding.page1_desc" = "Choose a subject and topic to start learning. Supports English, Chinese, and Reading.";
+"onboarding.page2_title" = "Multiple Practice Modes";
+"onboarding.page2_desc" = "Flip cards, multiple choice, listening quiz. Chinese also has Meaning → Hanzi practice.";
+"onboarding.page3_title" = "SRS Scheduled Review";
+"onboarding.page3_desc" = "The system reminds you to review vocabulary at the right time for long-term memory.";
+"onboarding.page4_title" = "Track Your Progress";
+"onboarding.page4_desc" = "View streaks, learning statistics, and track your improvement.";
+
+/* Splash */
+"splash.subtitle" = "Learn vocabulary effectively";
+"splash.bravo" = "Great!";
+
+/* CSV */
+"csv.export_title" = "Export Vocabulary to CSV";
+"csv.export_topic" = "Topic: %@";
+"csv.export_action" = "Export & Share";
+"csv.export_nav" = "Export CSV";
+"csv.export_error" = "CSV Export Error";
+"csv.no_data" = "No data to export.";
+"csv.import_title" = "Import Vocabulary from CSV";
+"csv.import_topic" = "Topic: %@";
+"csv.import_success" = "Imported %d words";
+"csv.import_errors" = "%d errors";
+"csv.import_pick" = "Choose CSV file";
+
+/* Backup */
+"backup.save_sqlite" = "Backup SQLite";
+"backup.export_sqlite" = "Export SQLite";
+"backup.restore" = "Restore from backup";
+"backup.title" = "Backup & Restore";
+"backup.footer" = "Backups are saved to Files > FlashCardMobile > Backups. Export SQLite shares via iCloud, AirDrop, etc.";
+"backup.data_section" = "Backup Data";
+"backup.restore_error" = "Unable to restore file.";
+"backup.saved_title" = "Backed Up";
+"backup.saved_message" = "Saved to:\n%@\n\nOpen Files > FlashCardMobile > Backups to view.";
+"backup.save_error" = "Unable to backup database.";
+"backup.export_error" = "Unable to create export file.";
+"backup.success_default" = "Backup successful.";
+
+/* Errors */
+"csv.create_error" = "Cannot create file: %@";
+
+/* Reading */
+"reading.empty" = "No readings yet";
+"reading.empty_desc" = "This topic has no readings yet.";
+"reading.title" = "Reading";
+
+/* Speech */
+"speech.no_voice" = "No voice available. Go to Settings → Accessibility → Spoken Content to download a voice.";

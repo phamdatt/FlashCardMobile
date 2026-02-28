@@ -7,13 +7,35 @@ import Foundation
 import Combine
 
 enum PracticeType: String, CaseIterable {
-    case flipCard = "Thẻ lật"
-    case multipleChoice = "Trắc nghiệm"
-    case listening = "Nghe → chọn"
-    case meaningToHanzi = "Nghĩa → Hán tự"
+    case flipCard = "flip_card"
+    case multipleChoice = "multiple_choice"
+    case listening = "listening"
+    case meaningToHanzi = "meaning_to_hanzi"
+
+    static let similarVocabKey = "similar_vocab"
+    static let randomDailyKey = "random_daily"
+    static let mistakesKey = "frequently_wrong"
+
+    var displayName: String {
+        switch self {
+        case .flipCard: return L("practice_type.flip_card")
+        case .multipleChoice: return L("practice_type.multiple_choice")
+        case .listening: return L("practice_type.listening")
+        case .meaningToHanzi: return L("practice_type.meaning_to_hanzi")
+        }
+    }
+
+    var descriptionText: String {
+        switch self {
+        case .flipCard: return L("practice_type.flip_desc")
+        case .multipleChoice: return L("practice_type.mc_desc")
+        case .listening: return L("practice_type.listen_desc")
+        case .meaningToHanzi: return L("practice_type.hanzi_desc")
+        }
+    }
 
     static func availableTypes(subjectName: String?) -> [PracticeType] {
-        let base: [PracticeType] = [.flipCard, .multipleChoice, .listening]
+        let base: [PracticeType] = [.multipleChoice, .listening]
         if subjectName == "Tiếng Trung" {
             return base + [.meaningToHanzi]
         }

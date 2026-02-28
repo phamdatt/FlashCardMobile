@@ -71,23 +71,23 @@ struct MainTabView: View {
             set: { appViewModel.selectedTabIndex = $0 }
         )) {
             SubjectsScreen(viewModel: appViewModel)
-                .tabItem { Label("Học", systemImage: "book.fill") }
+                .tabItem { Label(L("tab.learn"), systemImage: "book.fill") }
                 .tag(Tab.learn.rawValue)
 
             ReviewScreen(viewModel: reviewViewModel, appViewModel: appViewModel)
-                .tabItem { Label("Ôn tập", systemImage: "square.stack.3d.up.fill") }
+                .tabItem { Label(L("tab.review"), systemImage: "square.stack.3d.up.fill") }
                 .tag(Tab.review.rawValue)
 
             SearchScreen(viewModel: appViewModel)
-                .tabItem { Label("Tìm kiếm", systemImage: "magnifyingglass.circle.fill") }
+                .tabItem { Label(L("tab.search"), systemImage: "magnifyingglass.circle.fill") }
                 .tag(Tab.search.rawValue)
 
             StatisticsScreen(viewModel: statisticsViewModel)
-                .tabItem { Label("Thống kê", systemImage: "chart.bar.fill") }
+                .tabItem { Label(L("tab.statistics"), systemImage: "chart.bar.fill") }
                 .tag(Tab.statistics.rawValue)
 
             SettingsScreen(appViewModel: appViewModel)
-                .tabItem { Label("Cài đặt", systemImage: "gearshape.fill") }
+                .tabItem { Label(L("tab.settings"), systemImage: "gearshape.fill") }
                 .tag(Tab.settings.rawValue)
         }
         .tint(AppTheme.iconTint)

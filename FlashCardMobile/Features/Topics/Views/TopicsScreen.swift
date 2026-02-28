@@ -14,7 +14,7 @@ struct TopicsScreen: View {
     @State private var showPracticeAll = false
 
     private var isReadingSubject: Bool {
-        subject.name == "Bài đọc"
+        subject.name == L("subject.reading")
     }
 
     init(subject: Subject, viewModel: AppViewModel) {
@@ -36,16 +36,24 @@ struct TopicsScreen: View {
                     .contextMenu {
                         Button {
                             HapticFeedback.impact()
+                            selectedTopic = topic
+                        } label: {
+                            Label(L("common.open"), systemImage: "arrow.right.circle")
+                        }
+                        Button {
+                            HapticFeedback.impact()
                             topicsViewModel.setTopicToEdit(topic)
                         } label: {
-                            Label("Sửa", systemImage: "pencil")
+                            Label(L("common.edit"), systemImage: "pencil")
                         }
                         Button(role: .destructive) {
                             HapticFeedback.impact()
                             topicsViewModel.setTopicToDelete(topic)
                         } label: {
-                            Label("Xóa", systemImage: "trash")
+                            Label(L("common.delete"), systemImage: "trash")
                         }
+                    } preview: {
+                        TopicPreviewCard(topic: topic, subjectName: subject.name)
                     }
                 }
             }
@@ -54,7 +62,7 @@ struct TopicsScreen: View {
         .background(AppTheme.surface)
         .navigationTitle(subject.name)
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: topicsViewModel.searchTextBinding, prompt: "Tìm chủ đề")
+        .searchable(text: topicsViewModel.searchTextBinding, prompt: L("topics.search_placeholder"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 HStack(spacing: 16) {
@@ -76,7 +84,7 @@ struct TopicsScreen: View {
             }
         }
         .navigationDestination(item: $selectedTopic) { topic in
-            if subject.name == "Bài đọc" {
+            if subject.name == L("subject.reading") {
                 ReadingListScreen(topic: topic)
             } else {
                 FlashcardListScreen(topic: topic, subject: subject, viewModel: viewModel)
@@ -95,15 +103,15 @@ struct TopicsScreen: View {
                 topicsViewModel.clearTopicToEdit()
             })
         }
-        .alert("Xóa chủ đề?", isPresented: Binding(
+        .alert(L("topics.delete_title"), isPresented: Binding(
             get: { topicsViewModel.topicToDelete != nil },
             set: { if !$0 { topicsViewModel.clearTopicToDelete() } }
         )) {
-            Button("Hủy", role: .cancel) {
+            Button(L("common.cancel"), role: .cancel) {
                 HapticFeedback.impact()
                 topicsViewModel.clearTopicToDelete()
             }
-            Button("Xóa", role: .destructive) {
+            Button(L("common.delete"), role: .destructive) {
                 HapticFeedback.impact()
                 if let t = topicsViewModel.topicToDelete {
                     _ = topicsViewModel.deleteTopic(id: t.id)
@@ -111,7 +119,7 @@ struct TopicsScreen: View {
             }
         } message: {
             if let t = topicsViewModel.topicToDelete {
-                Text("Chủ đề \"\(t.name)\" và tất cả từ vựng sẽ bị xóa vĩnh viễn.")
+                Text(L("topics.delete_message", t.name))
             }
         }
     }
@@ -125,9 +133,9 @@ struct TopicsScreen: View {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.title2)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Luyện tập tất cả")
+                    Text(L("topics.practice_all"))
                         .fontWeight(.semibold)
-                    Text("Ôn tập toàn bộ \(subject.name)")
+                    Text(L("topics.practice_all_subtitle", subject.name))
                         .font(.caption)
                         .opacity(0.9)
                 }
@@ -137,13 +145,7 @@ struct TopicsScreen: View {
             }
             .padding(16)
             .foregroundStyle(.white)
-            .background(
-                LinearGradient(
-                    colors: [AppTheme.primary.opacity(0.9), Color(red: 0.56, green: 0.34, blue: 0.89)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .background(AppTheme.heroGradient)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(HapticButtonStyle())
@@ -160,21 +162,21 @@ struct AddTopicSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Tên chủ đề", text: $name)
+                    TextField(L("topics.name_placeholder"), text: $name)
                         .focused($focused)
                 }
             }
-            .navigationTitle("Thêm chủ đề")
+            .navigationTitle(L("topics.add_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") {
+                    Button(L("common.cancel")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Lưu") {
+                    Button(L("common.save")) {
                         HapticFeedback.impact()
                         if viewModel.addTopic(name: name) {
                             onDismiss()
@@ -199,11 +201,11 @@ struct EditTopicSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Tên chủ đề", text: $name)
+                    TextField(L("topics.name_placeholder"), text: $name)
                         .focused($focused)
                 }
             }
-            .navigationTitle("Sửa chủ đề")
+            .navigationTitle(L("topics.edit_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -268,7 +270,7 @@ struct TopicCard: View {
                 }
                 Spacer()
                 if hasPractice {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: "checkmark.seal.fill")
                         .foregroundStyle(AppTheme.accentGreen)
                 }
                 Image(systemName: "chevron.right")
@@ -279,5 +281,65 @@ struct TopicCard: View {
             .cardStyle()
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Topic Preview (long-press)
+
+struct TopicPreviewCard: View {
+    let topic: Topic
+    let subjectName: String
+
+    private var previewCards: [Flashcard] {
+        Array(topic.flashcards.prefix(8))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: subjectName == "Bài đọc" ? "doc.text.fill" : "rectangle.stack.fill")
+                    .font(.title3)
+                    .foregroundStyle(AppTheme.primary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(topic.name)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                    Text("\(topic.flashcards.count) \(subjectName == "Bài đọc" ? "bài" : "từ")")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+            }
+
+            if !previewCards.isEmpty {
+                Divider()
+                ForEach(previewCards) { card in
+                    HStack(spacing: 8) {
+                        Text(card.questionDisplayText)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .lineLimit(1)
+                        if let p = card.displayPhonetic, !p.isEmpty {
+                            Text(p)
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.textSecondary)
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                        Text(card.answer)
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.textSecondary)
+                            .lineLimit(1)
+                    }
+                }
+                if topic.flashcards.count > 8 {
+                    Text("+ \(topic.flashcards.count - 8) từ khác...")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+            }
+        }
+        .padding(20)
+        .frame(width: 320)
+        .background(AppTheme.cardBg)
     }
 }

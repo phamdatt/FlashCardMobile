@@ -13,7 +13,6 @@ struct SubjectsScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
-                    streakBanner
                     subjectGrid
                 }
                 .padding()
@@ -22,6 +21,24 @@ struct SubjectsScreen: View {
             .navigationTitle("Học tập")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        viewModel.selectedTabIndex = 3 // Navigate to Statistics tab
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: viewModel.streakInfo.didPracticeToday ? "flame.fill" : "flame")
+                                .foregroundStyle(viewModel.streakInfo.didPracticeToday ? AppTheme.accentOrange : AppTheme.textSecondary)
+                            Text("\(viewModel.streakInfo.currentStreak)")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.primary)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(AppTheme.cardBg)
+                        .clipShape(Capsule())
+                    }
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         viewModel.selectedTabIndex = 2
@@ -37,44 +54,6 @@ struct SubjectsScreen: View {
             .navigationDestination(item: $selectedSubject) { subject in
                 TopicsScreen(subject: subject, viewModel: viewModel)
             }
-        }
-    }
-
-    private var streakBanner: some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: viewModel.streakInfo.didPracticeToday ? "flame.fill" : "flame")
-                    .font(.title2)
-                    .foregroundStyle(viewModel.streakInfo.didPracticeToday ? AppTheme.accentOrange : AppTheme.textSecondary)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(viewModel.streakInfo.currentStreak) ngày")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    Text("Streak hiện tại")
-                        .font(.caption)
-                        .foregroundStyle(AppTheme.textSecondary)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .subtleCard()
-
-            HStack(spacing: 8) {
-                Image(systemName: "trophy.fill")
-                    .font(.title2)
-                    .foregroundStyle(AppTheme.accentOrange)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(viewModel.streakInfo.longestStreak) ngày")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    Text("Kỷ lục")
-                        .font(.caption)
-                        .foregroundStyle(AppTheme.textSecondary)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .subtleCard()
         }
     }
 

@@ -18,17 +18,17 @@ struct FlashcardDetailScreen: View {
             VStack(alignment: .leading, spacing: 20) {
                 heroCard
                 if let phonetic = flashcard.displayPhonetic, !phonetic.isEmpty {
-                    detailRow(icon: "textformat.phonetic", title: "Phiên âm", content: phonetic)
+                    detailRow(icon: "textformat.phonetic", title: L("detail.phonetic"), content: phonetic)
                 }
-                detailRow(icon: "checkmark.circle", title: "Nghĩa", content: flashcard.answer)
+                detailRow(icon: "checkmark.circle", title: L("detail.meaning"), content: flashcard.answer)
                 if let hint = flashcard.hint, !hint.isEmpty {
-                    detailRow(icon: "lightbulb", title: "Gợi ý", content: hint)
+                    detailRow(icon: "lightbulb", title: L("detail.hint"), content: hint)
                 }
                 if let radical = flashcard.radical, !radical.isEmpty {
-                    detailRow(icon: "square.grid.2x2", title: "Bộ thủ", content: radical)
+                    detailRow(icon: "square.grid.2x2", title: L("detail.radical"), content: radical)
                 }
                 if let notes = flashcard.notes, !notes.isEmpty {
-                    detailRow(icon: "note.text", title: "Ghi chú", content: notes)
+                    detailRow(icon: "note.text", title: L("detail.notes"), content: notes)
                 }
 
                 similarPracticeButton
@@ -37,7 +37,7 @@ struct FlashcardDetailScreen: View {
             .padding(.vertical, 20)
         }
         .background(AppTheme.surface)
-        .navigationTitle("Chi tiết")
+        .navigationTitle(L("detail.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -46,13 +46,13 @@ struct FlashcardDetailScreen: View {
                         HapticFeedback.impact()
                         UIPasteboard.general.string = flashcard.copyText
                     } label: {
-                        Label("Sao chép từ vựng", systemImage: "doc.on.doc")
+                        Label(L("detail.copy"), systemImage: "doc.on.doc")
                     }
                     Button {
                         HapticFeedback.impact()
                         showEditSheet = true
                     } label: {
-                        Label("Sửa", systemImage: "pencil")
+                        Label(L("common.edit"), systemImage: "pencil")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -83,11 +83,11 @@ struct FlashcardDetailScreen: View {
                     .background(AppTheme.iconTint.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Luyện từ tương tự")
+                    Text(L("detail.practice_similar"))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
-                    Text("Phân biệt hán tự & pinyin giống nhau")
+                    Text(L("detail.practice_similar_subtitle"))
                         .font(.caption)
                         .foregroundStyle(AppTheme.textSecondary)
                 }
@@ -129,14 +129,21 @@ struct FlashcardDetailScreen: View {
                     Image(systemName: speechManager.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                         .font(.body.weight(.medium))
                         .symbolEffect(.variableColor.iterative, isActive: speechManager.isSpeaking)
-                    Text(speechManager.isSpeaking ? "Đang phát..." : "Nghe phát âm")
+                    Text(speechManager.isSpeaking ? L("detail.speaking") : L("detail.listen"))
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
-                .background(.white.opacity(0.2))
+                .background(
+                    Capsule()
+                        .fill(.white.opacity(0.2))
+                        .overlay(
+                            SpeakingRippleEffect(isActive: speechManager.isSpeaking, color: .white)
+                                .clipShape(Capsule())
+                        )
+                )
                 .clipShape(Capsule())
             }
             .buttonStyle(HapticButtonStyle())
@@ -145,13 +152,7 @@ struct FlashcardDetailScreen: View {
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primary.opacity(0.9), Color(red: 0.56, green: 0.34, blue: 0.89)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.heroGradient)
         )
         .shadow(color: AppTheme.primary.opacity(0.2), radius: 12, x: 0, y: 6)
     }

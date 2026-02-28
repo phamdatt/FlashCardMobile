@@ -19,6 +19,8 @@ struct ListeningPracticeScreen: View {
     @State private var totalAnswered = 0
     @State private var showResult = false
     @State private var currentOptions: [(label: String, meaning: String)] = []
+    @State private var showSettings = false
+    @State private var phoneticRevealed = false
     @AppStorage("practice_show_pinyin") private var showPinyin = true
 
     private var languageForTTS: String? {
@@ -55,7 +57,7 @@ struct ListeningPracticeScreen: View {
             }
         }
         .sheet(isPresented: $showResult) {
-            PracticeResultSheet(score: score, total: totalAnswered) {
+            PracticeResultSheet(score: score, total: totalAnswered, practiceType: "Nghe → chọn", topicId: topic.id) {
                 showResult = false
                 dismiss()
             }
@@ -63,54 +65,43 @@ struct ListeningPracticeScreen: View {
     }
 
     private var progressBar: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(AppTheme.textSecondary)
-                }
-                Spacer()
-                Text("\(currentIndex + 1) / \(cards.count)")
-                    .font(.subheadline)
+        HStack {
+            Button { dismiss() } label: {
+                Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(AppTheme.textSecondary)
-                Spacer()
             }
-            pinyinToggle
+            Spacer()
+            Text("\(currentIndex + 1) / \(cards.count)")
+                .font(.subheadline)
+                .foregroundStyle(AppTheme.textSecondary)
+            Spacer()
+            Button { showSettings = true } label: {
+                Image(systemName: "gearshape")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AppTheme.textSecondary)
+            }
+            .sheet(isPresented: $showSettings) {
+                PracticeSettingsDrawer()
+            }
         }
         .padding()
     }
 
-    private var pinyinToggle: some View {
-        HStack {
-            Label("Pinyin", systemImage: "textformat.phonetic")
-                .font(.subheadline)
-                .foregroundStyle(AppTheme.textSecondary)
-            Spacer()
-            Toggle("", isOn: $showPinyin)
-                .labelsHidden()
-                .tint(AppTheme.primary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(AppTheme.cardBg)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
     private var emptyState: some View {
         ContentUnavailableView(
-            "Không có thẻ",
+            L("practice.no_cards"),
             systemImage: "speaker.slash",
-            description: Text("Chủ đề này chưa có từ để luyện nghe.")
+            description: Text(L("listening.no_vocab"))
         )
     }
 
     private var doneView: some View {
         VStack(spacing: 16) {
-            Text("Hoàn thành!")
+            Text(L("review.complete_title"))
                 .font(.title2)
                 .fontWeight(.bold)
-            Button("Đóng") {
+            Button(L("common.close")) {
                 HapticFeedback.impact()
                 dismiss()
             }
@@ -128,7 +119,7 @@ struct ListeningPracticeScreen: View {
         let card = cards[currentIndex]
         return ScrollView {
             VStack(spacing: 24) {
-                Text("Nghe và chọn nghĩa đúng")
+                Text(L("listening.instruction"))
                     .font(.headline)
                     .foregroundStyle(AppTheme.textSecondary)
 
@@ -139,12 +130,20 @@ struct ListeningPracticeScreen: View {
                     HStack(spacing: 10) {
                         Image(systemName: speechManager.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                             .font(.system(size: 28))
-                        Text(speechManager.isSpeaking ? "Đang phát..." : "Phát âm")
+                            .symbolEffect(.variableColor.iterative, isActive: speechManager.isSpeaking)
+                        Text(speechManager.isSpeaking ? L("listening.playing") : L("listening.play"))
                             .fontWeight(.medium)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
-                    .background(AppTheme.surface)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(AppTheme.surface)
+                            .overlay(
+                                SpeakingRippleEffect(isActive: speechManager.isSpeaking, color: AppTheme.primary)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .buttonStyle(HapticButtonStyle())
@@ -155,20 +154,28 @@ struct ListeningPracticeScreen: View {
                         HStack {
                             Image(systemName: lastCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
-                            Text(lastCorrect ? "Đúng rồi!" : "Sai - Đáp án: \(card.answer)")
+                            Text(lastCorrect ? L("practice.correct") : L("practice.wrong_answer", card.answer))
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
                         }
-                        if !lastCorrect, showPinyin, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
+                        if !lastCorrect, showPinyin || phoneticRevealed, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
                             Text("\(card.questionDisplayText) — \(phonetic)")
                                 .font(.caption)
                                 .foregroundStyle(AppTheme.textSecondary)
+                                .transition(.opacity)
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background((lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed).opacity(0.15))
+                    .onTapGesture {
+                        if !showPinyin, !lastCorrect {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                phoneticRevealed.toggle()
+                            }
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     PracticeHintCard(card: card)
@@ -181,10 +188,11 @@ struct ListeningPracticeScreen: View {
                             currentIndex += 1
                             selectedAnswer = nil
                             showFeedback = false
+                            phoneticRevealed = false
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            Text("Tiếp tục")
+                            Text(L("common.continue"))
                             Image(systemName: "arrow.right")
                                 .font(.body.weight(.semibold))
                         }
@@ -212,6 +220,7 @@ struct ListeningPracticeScreen: View {
                             showFeedback = true
                             totalAnswered += 1
                             if correct { score += 1 }
+                            if correct { SoundEffect.playCorrect() } else { SoundEffect.playWrong() }
 
                             recordAnswer(card: card, correct: correct)
                         }
@@ -243,14 +252,5 @@ struct ListeningPracticeScreen: View {
             }
             DatabaseManager.shared.saveFlashcardProgress(progress)
         }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        DatabaseManager.shared.recordPracticeSession(
-            practiceDate: formatter.string(from: Date()),
-            practiceType: "Nghe → chọn",
-            topicId: topic.id,
-            correct: correct ? 1 : 0,
-            total: 1
-        )
     }
 }

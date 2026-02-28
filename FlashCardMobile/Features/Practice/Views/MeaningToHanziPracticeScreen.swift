@@ -17,6 +17,8 @@ struct MeaningToHanziPracticeScreen: View {
     @State private var score = 0
     @State private var totalAnswered = 0
     @State private var showResult = false
+    @State private var showSettings = false
+    @State private var phoneticRevealed = false
     @FocusState private var isTextFieldFocused: Bool
     @AppStorage("practice_show_pinyin") private var showPinyin = true
 
@@ -39,7 +41,7 @@ struct MeaningToHanziPracticeScreen: View {
             cards = topic.flashcards.shuffled()
         }
         .sheet(isPresented: $showResult) {
-            PracticeResultSheet(score: score, total: totalAnswered) {
+            PracticeResultSheet(score: score, total: totalAnswered, practiceType: "Nghĩa → Hán tự", topicId: topic.id) {
                 showResult = false
                 dismiss()
             }
@@ -47,48 +49,37 @@ struct MeaningToHanziPracticeScreen: View {
     }
 
     private var progressBar: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Button {
-                    HapticFeedback.impact()
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(AppTheme.textSecondary)
-                }
-                Spacer()
-                Text("\(currentIndex + 1) / \(cards.count)")
-                    .font(.subheadline)
+        HStack {
+            Button {
+                HapticFeedback.impact()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(AppTheme.textSecondary)
-                Spacer()
             }
-            pinyinToggle
+            Spacer()
+            Text("\(currentIndex + 1) / \(cards.count)")
+                .font(.subheadline)
+                .foregroundStyle(AppTheme.textSecondary)
+            Spacer()
+            Button { showSettings = true } label: {
+                Image(systemName: "gearshape")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AppTheme.textSecondary)
+            }
+            .sheet(isPresented: $showSettings) {
+                PracticeSettingsDrawer()
+            }
         }
         .padding()
     }
 
-    private var pinyinToggle: some View {
-        HStack {
-            Label("Pinyin", systemImage: "textformat.phonetic")
-                .font(.subheadline)
-                .foregroundStyle(AppTheme.textSecondary)
-            Spacer()
-            Toggle("", isOn: $showPinyin)
-                .labelsHidden()
-                .tint(AppTheme.primary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(AppTheme.cardBg)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
     private var emptyState: some View {
         ContentUnavailableView(
-            "Không có từ vựng",
+            L("practice.no_cards"),
             systemImage: "character.book.closed",
-            description: Text("Chủ đề này chưa có từ để luyện Nghĩa → Hán tự.")
+            description: Text(L("hanzi.no_vocab"))
         )
     }
 
@@ -96,7 +87,7 @@ struct MeaningToHanziPracticeScreen: View {
         let card = cards[currentIndex]
         return ScrollView {
             VStack(spacing: 24) {
-                Text("Ý nghĩa (viết hán tự):")
+                Text(L("hanzi.instruction"))
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
 
@@ -109,10 +100,10 @@ struct MeaningToHanziPracticeScreen: View {
                     .cardStyle()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Hán tự của bạn:")
+                    Text(L("hanzi.your_answer"))
                         .font(.subheadline)
                         .foregroundStyle(AppTheme.textSecondary)
-                    TextField("Ví dụ: 你好", text: $userHanzi)
+                    TextField(L("hanzi.placeholder"), text: $userHanzi)
                         .font(.title2)
                         .padding()
                         .background(AppTheme.cardBg)
@@ -132,19 +123,20 @@ struct MeaningToHanziPracticeScreen: View {
                             Image(systemName: lastCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .font(.title2)
                                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
-                            Text(lastCorrect ? "Chính xác!" : "Chưa đúng")
+                            Text(lastCorrect ? L("hanzi.correct") : L("hanzi.wrong"))
                                 .font(.headline)
                                 .foregroundStyle(lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed)
                         }
                         if !lastCorrect {
                             VStack(spacing: 4) {
-                                Text("Hán tự đúng: \(card.questionDisplayText)")
+                                Text(L("hanzi.correct_answer", card.questionDisplayText))
                                     .font(.title3)
                                     .foregroundStyle(AppTheme.primary)
-                                if showPinyin, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
+                                if showPinyin || phoneticRevealed, let phonetic = card.displayPhonetic, !phonetic.isEmpty {
                                     Text(phonetic)
                                         .font(.subheadline)
                                         .foregroundStyle(AppTheme.textSecondary)
+                                        .transition(.opacity)
                                 }
                             }
                         }
@@ -153,6 +145,13 @@ struct MeaningToHanziPracticeScreen: View {
                     .padding()
                     .background((lastCorrect ? AppTheme.accentGreen : AppTheme.accentRed).opacity(0.15))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .onTapGesture {
+                        if !showPinyin, !lastCorrect {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                phoneticRevealed.toggle()
+                            }
+                        }
+                    }
 
                     PracticeHintCard(card: card)
                 }
@@ -167,13 +166,14 @@ struct MeaningToHanziPracticeScreen: View {
                             currentIndex += 1
                             userHanzi = ""
                             showFeedback = false
+                            phoneticRevealed = false
                         }
                     } else {
                         checkAnswer()
                     }
                 } label: {
                     HStack(spacing: 8) {
-                        Text(showFeedback ? "Tiếp tục" : "Kiểm tra")
+                        Text(showFeedback ? L("common.continue") : L("common.check"))
                         if showFeedback {
                             Image(systemName: "arrow.right")
                                 .font(.body.weight(.semibold))
@@ -203,6 +203,7 @@ struct MeaningToHanziPracticeScreen: View {
 
         totalAnswered += 1
         if lastCorrect { score += 1 }
+        if lastCorrect { SoundEffect.playCorrect() } else { SoundEffect.playWrong() }
 
         DatabaseManager.shared.ensureProgressExists(flashcardId: card.id)
         if var progress = DatabaseManager.shared.getFlashcardProgress(flashcardId: card.id) {
@@ -214,16 +215,6 @@ struct MeaningToHanziPracticeScreen: View {
             }
             DatabaseManager.shared.saveFlashcardProgress(progress)
         }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        DatabaseManager.shared.recordPracticeSession(
-            practiceDate: formatter.string(from: Date()),
-            practiceType: "Nghĩa → Hán tự",
-            topicId: topic.id,
-            correct: lastCorrect ? 1 : 0,
-            total: 1
-        )
-
         showFeedback = true
         isTextFieldFocused = false
     }

@@ -15,24 +15,35 @@ struct PracticeAllScreen: View {
     }
 
     @Environment(\.dismiss) private var dismiss
-    @State private var practiceType: PracticeType = .flipCard
-    @State private var showFlipPractice = false
     @State private var showMultipleChoicePractice = false
     @State private var showListeningPractice = false
     @State private var showMeaningToHanziPractice = false
-    @State private var selectedLimit: Int = 20
+    @State private var selectedLimit: Int = 0
     @State private var loadedCards: [Flashcard] = []
     @State private var totalCardCount: Int = 0
-    @State private var isLoading = true
+    @State private var isLoadingPractice = false
 
-    private let limitOptions: [Int] = [20, 30, 40, 50, 0]
+    private var limitOptions: [Int] {
+        guard totalCardCount > 0 else { return [0] }
+        let half = totalCardCount / 2
+        let start = max(5, (half / 5) * 5)
+        var options: [Int] = []
+        var current = start
+        while current <= totalCardCount {
+            options.append(current)
+            current += 5
+        }
+        if options.last != totalCardCount {
+            options.append(0)
+        }
+        return options
+    }
 
     private var practiceTopic: Topic {
-        let cards = loadedCards
         if let topic = topic {
-            return Topic(id: topic.id, name: topic.name, subjectId: subject.id, flashcards: cards)
+            return Topic(id: topic.id, name: topic.name, subjectId: subject.id, flashcards: loadedCards)
         }
-        return Topic(id: -1, name: "Tất cả \(subject.name)", subjectId: subject.id, flashcards: cards)
+        return Topic(id: -1, name: "Tất cả \(subject.name)", subjectId: subject.id, flashcards: loadedCards)
     }
 
     private var availableTypes: [PracticeType] {
@@ -40,53 +51,53 @@ struct PracticeAllScreen: View {
     }
 
     var body: some View {
-        Group {
-            if isLoading {
-                VStack {
-                    Spacer()
-                    ProgressView("Đang tải từ vựng...")
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        headerCard
+        ZStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    headerCard
 
-                        limitPicker
+                    limitPicker
 
-                        Text("Chọn kiểu luyện tập")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("Chọn kiểu luyện tập")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        ForEach(availableTypes, id: \.self) { type in
-                            PracticeTypeCard(type: type) {
-                                HapticFeedback.impact()
-                                practiceType = type
-                                switch type {
-                                case .flipCard: showFlipPractice = true
-                                case .multipleChoice: showMultipleChoicePractice = true
-                                case .listening: showListeningPractice = true
-                                case .meaningToHanzi: showMeaningToHanziPractice = true
-                                }
-                            }
+                    ForEach(availableTypes, id: \.self) { type in
+                        PracticeTypeCard(type: type) {
+                            HapticFeedback.impact()
+                            Task { await startPractice(type: type) }
                         }
+                        .disabled(isLoadingPractice)
                     }
-                    .padding()
                 }
+                .padding()
+            }
+
+            if isLoadingPractice {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("Đang tải từ vựng...")
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                }
+                .padding(24)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
         .background(AppTheme.surface)
         .navigationTitle(topic != nil ? "Luyện tập" : "Luyện tập tất cả")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadCards()
-        }
-        .onChange(of: selectedLimit) { _, newLimit in
-            Task { await loadCards(limit: newLimit) }
-        }
-        .fullScreenCover(isPresented: $showFlipPractice) {
-            FlipCardPracticeScreen(topic: practiceTopic, subject: subject)
+            if let topic = topic {
+                totalCardCount = topic.flashcards.count
+            } else {
+                totalCardCount = DatabaseManager.shared.countAllFlashcards(subjectId: subject.id)
+            }
+            selectedLimit = limitOptions.first ?? 0
         }
         .fullScreenCover(isPresented: $showMultipleChoicePractice) {
             MultipleChoicePracticeScreen(topic: practiceTopic, subject: subject)
@@ -99,28 +110,28 @@ struct PracticeAllScreen: View {
         }
     }
 
-    private func loadCards(limit: Int? = nil) async {
-        let effectiveLimit = limit ?? selectedLimit
+    private func startPractice(type: PracticeType) async {
+        isLoadingPractice = true
         let cards: [Flashcard]
+        let lim = selectedLimit
         if let topic = topic {
             let all = topic.flashcards.shuffled()
-            cards = effectiveLimit > 0 ? Array(all.prefix(effectiveLimit)) : all
-            await MainActor.run {
-                totalCardCount = topic.flashcards.count
-            }
+            cards = lim > 0 ? Array(all.prefix(lim)) : all
         } else {
             let sid = subject.id
-            let count = DatabaseManager.shared.countAllFlashcards(subjectId: sid)
             cards = await Task.detached {
-                DatabaseManager.shared.loadAllFlashcards(subjectId: sid, limit: effectiveLimit > 0 ? effectiveLimit : nil)
+                DatabaseManager.shared.loadAllFlashcards(subjectId: sid, limit: lim > 0 ? lim : nil)
             }.value
-            await MainActor.run {
-                totalCardCount = count
-            }
         }
         await MainActor.run {
             loadedCards = cards
-            isLoading = false
+            isLoadingPractice = false
+            switch type {
+            case .flipCard: break
+            case .multipleChoice: showMultipleChoicePractice = true
+            case .listening: showListeningPractice = true
+            case .meaningToHanzi: showMeaningToHanziPractice = true
+            }
         }
     }
 
@@ -141,13 +152,7 @@ struct PracticeAllScreen: View {
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primary.opacity(0.9), Color(red: 0.56, green: 0.34, blue: 0.89)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.heroGradient)
         )
         .shadow(color: AppTheme.primary.opacity(0.2), radius: 12, x: 0, y: 6)
     }
@@ -204,15 +209,6 @@ struct PracticeTypeCard: View {
         }
     }
 
-    private var description: String {
-        switch type {
-        case .flipCard: return "Lật thẻ để nhớ từ"
-        case .multipleChoice: return "Chọn đáp án đúng"
-        case .listening: return "Nghe và nhận diện từ"
-        case .meaningToHanzi: return "Viết hán tự từ nghĩa"
-        }
-    }
-
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 16) {
@@ -223,11 +219,11 @@ struct PracticeTypeCard: View {
                     .background(AppTheme.iconTint.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(type.rawValue)
+                    Text(type.displayName )
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
-                    Text(description)
+                    Text(type.descriptionText)
                         .font(.caption)
                         .foregroundStyle(AppTheme.textSecondary)
                 }

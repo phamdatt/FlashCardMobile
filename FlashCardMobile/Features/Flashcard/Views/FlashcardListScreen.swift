@@ -48,19 +48,19 @@ struct FlashcardListScreen: View {
                         HapticFeedback.impact()
                         showAddFlashcard = true
                     } label: {
-                        Label("Thêm từ vựng", systemImage: "plus")
+                        Label(L("flashcard.add_vocab"), systemImage: "plus")
                     }
                     Button {
                         HapticFeedback.impact()
                         showExportSheet = true
                     } label: {
-                        Label("Xuất CSV", systemImage: "square.and.arrow.up")
+                        Label(L("flashcard.export_csv"), systemImage: "square.and.arrow.up")
                     }
                     Button {
                         HapticFeedback.impact()
                         showImportSheet = true
                     } label: {
-                        Label("Nhập CSV", systemImage: "square.and.arrow.down")
+                        Label(L("flashcard.import_csv"), systemImage: "square.and.arrow.down")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle.fill")
@@ -94,15 +94,15 @@ struct FlashcardListScreen: View {
                 listViewModel.clearFlashcardToEdit()
             })
         }
-        .alert("Xóa từ vựng?", isPresented: Binding(
+        .alert(L("flashcard.delete_title"), isPresented: Binding(
             get: { listViewModel.flashcardToDelete != nil },
             set: { if !$0 { listViewModel.clearFlashcardToDelete() } }
         )) {
-            Button("Hủy", role: .cancel) {
+            Button(L("common.cancel"), role: .cancel) {
                 HapticFeedback.impact()
                 listViewModel.clearFlashcardToDelete()
             }
-            Button("Xóa", role: .destructive) {
+            Button(L("common.delete"), role: .destructive) {
                 HapticFeedback.impact()
                 if let c = listViewModel.flashcardToDelete {
                     _ = listViewModel.deleteFlashcard(id: c.id)
@@ -110,7 +110,7 @@ struct FlashcardListScreen: View {
             }
         } message: {
             if let c = listViewModel.flashcardToDelete {
-                Text("Từ \"\(c.questionDisplayText)\" sẽ bị xóa vĩnh viễn.")
+                Text(L("flashcard.delete_message", c.questionDisplayText))
             }
         }
         .navigationDestination(isPresented: $showPracticePicker) {
@@ -126,7 +126,7 @@ struct FlashcardListScreen: View {
             HStack {
                 Image(systemName: "play.circle.fill")
                     .font(.title2)
-                Text("Bắt đầu luyện tập")
+                Text(L("flashcard.start_practice"))
                     .fontWeight(.semibold)
                 Spacer()
                 Image(systemName: "chevron.right")
@@ -149,22 +149,30 @@ struct FlashcardListScreen: View {
                 .contextMenu {
                     Button {
                         HapticFeedback.impact()
+                        selectedFlashcard = card
+                    } label: {
+                        Label(L("flashcard.view_detail"), systemImage: "eye")
+                    }
+                    Button {
+                        HapticFeedback.impact()
                         UIPasteboard.general.string = card.copyText
                     } label: {
-                        Label("Sao chép", systemImage: "doc.on.doc")
+                        Label(L("common.copy"), systemImage: "doc.on.doc")
                     }
                     Button {
                         HapticFeedback.impact()
                         listViewModel.setFlashcardToEdit(card)
                     } label: {
-                        Label("Sửa", systemImage: "pencil")
+                        Label(L("common.edit"), systemImage: "pencil")
                     }
                     Button(role: .destructive) {
                         HapticFeedback.impact()
                         listViewModel.setFlashcardToDelete(card)
                     } label: {
-                        Label("Xóa", systemImage: "trash")
+                        Label(L("common.delete"), systemImage: "trash")
                     }
+                } preview: {
+                    FlashcardPreviewCard(card: card)
                 }
             }
         }
@@ -185,29 +193,29 @@ struct AddFlashcardSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Từ vựng") {
-                    TextField("Câu hỏi / Hán tự", text: $question)
+                Section(L("flashcard.section_vocab")) {
+                    TextField(L("flashcard.question_placeholder"), text: $question)
                         .focused($questionFocused)
-                    TextField("Đáp án / Nghĩa", text: $answer)
+                    TextField(L("flashcard.answer_placeholder"), text: $answer)
                 }
-                Section("Thông tin bổ sung") {
-                    TextField("Gợi ý", text: $hint)
-                    TextField("Phiên âm / Pinyin", text: $phonetic)
-                    TextField("Bộ thủ", text: $radical)
-                    TextField("Ghi chú", text: $notes)
+                Section(L("flashcard.section_extra")) {
+                    TextField(L("flashcard.hint_placeholder"), text: $hint)
+                    TextField(L("flashcard.phonetic_placeholder"), text: $phonetic)
+                    TextField(L("flashcard.radical_placeholder"), text: $radical)
+                    TextField(L("flashcard.notes_placeholder"), text: $notes)
                 }
             }
-            .navigationTitle("Thêm từ vựng")
+            .navigationTitle(L("flashcard.add_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") {
+                    Button(L("common.cancel")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Lưu") {
+                    Button(L("common.save")) {
                         HapticFeedback.impact()
                         if viewModel.addFlashcard(
                             question: question,
@@ -243,29 +251,29 @@ struct EditFlashcardSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Từ vựng") {
-                    TextField("Câu hỏi / Hán tự", text: $question)
+                Section(L("flashcard.section_vocab")) {
+                    TextField(L("flashcard.question_placeholder"), text: $question)
                         .focused($questionFocused)
-                    TextField("Đáp án / Nghĩa", text: $answer)
+                    TextField(L("flashcard.answer_placeholder"), text: $answer)
                 }
-                Section("Thông tin bổ sung") {
-                    TextField("Gợi ý", text: $hint)
-                    TextField("Phiên âm / Pinyin", text: $phonetic)
-                    TextField("Bộ thủ", text: $radical)
-                    TextField("Ghi chú", text: $notes)
+                Section(L("flashcard.section_extra")) {
+                    TextField(L("flashcard.hint_placeholder"), text: $hint)
+                    TextField(L("flashcard.phonetic_placeholder"), text: $phonetic)
+                    TextField(L("flashcard.radical_placeholder"), text: $radical)
+                    TextField(L("flashcard.notes_placeholder"), text: $notes)
                 }
             }
-            .navigationTitle("Sửa từ vựng")
+            .navigationTitle(L("flashcard.edit_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") {
+                    Button(L("common.cancel")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Lưu") {
+                    Button(L("common.save")) {
                         HapticFeedback.impact()
                         if viewModel.updateFlashcard(
                             id: flashcard.id,
@@ -327,6 +335,65 @@ struct FlashcardRow: View {
     }
 }
 
+// MARK: - Flashcard Preview (long-press)
+
+struct FlashcardPreviewCard: View {
+    let card: Flashcard
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text(card.questionDisplayText)
+                .font(.system(size: 32, weight: .bold))
+                .multilineTextAlignment(.center)
+
+            if let phonetic = card.displayPhonetic, !phonetic.isEmpty {
+                Text(phonetic)
+                    .font(.title3)
+                    .foregroundStyle(AppTheme.textSecondary)
+            }
+
+            Divider()
+
+            Text(card.answer)
+                .font(.title3)
+                .foregroundStyle(AppTheme.primary)
+                .multilineTextAlignment(.center)
+
+            if let hint = card.hint, !hint.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.accentOrange)
+                    Text(hint)
+                        .font(.subheadline)
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+            }
+
+            if let notes = card.notes, !notes.isEmpty {
+                Text(notes)
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            if let radical = card.radical, !radical.isEmpty {
+                HStack(spacing: 4) {
+                    Text(L("detail.radical_label"))
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.textSecondary)
+                    Text(radical)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                }
+            }
+        }
+        .padding(24)
+        .frame(width: 300)
+        .background(AppTheme.cardBg)
+    }
+}
+
 struct PracticeTypePicker: View {
     @Binding var selected: PracticeType
     var subjectName: String? = nil
@@ -354,11 +421,11 @@ struct PracticeTypePicker: View {
                     }
                 }
             }
-            .navigationTitle("Chọn kiểu luyện tập")
+            .navigationTitle(L("practice.choose_type"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") {
+                    Button(L("common.close")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }

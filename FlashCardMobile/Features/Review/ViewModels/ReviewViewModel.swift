@@ -14,6 +14,7 @@ final class ReviewViewModel: ObservableObject {
     @Published var showAnswer = false
     @Published var showQualityButtons = false
     @Published var showComplete = false
+    @Published private(set) var mistakeCount = 0
 
     private let db = DatabaseManager.shared
     private weak var appViewModel: AppViewModel?
@@ -23,6 +24,7 @@ final class ReviewViewModel: ObservableObject {
         return cards[currentIndex]
     }
 
+    var dueCount: Int { dueIds.count }
     var hasCards: Bool { !cards.isEmpty }
     var isEmpty: Bool { dueIds.isEmpty && !showComplete }
 
@@ -37,6 +39,10 @@ final class ReviewViewModel: ObservableObject {
         showAnswer = false
         showQualityButtons = false
         showComplete = false
+    }
+
+    func loadMistakes() {
+        mistakeCount = db.getMistakeFlashcards(days: 30).count
     }
 
     func refreshStreak() {

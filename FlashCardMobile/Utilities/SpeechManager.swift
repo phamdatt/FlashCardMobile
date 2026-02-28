@@ -37,7 +37,7 @@ final class SpeechManager: ObservableObject {
         let lang = language ?? detectLanguage(t)
         let voice = voiceForLanguage(lang)
         guard let voice = voice else {
-            ttsUnavailableMessage = "Chưa có giọng đọc. Vào Cài đặt → Trợ năng → Nội dung đọc để tải giọng."
+            ttsUnavailableMessage = L("speech.no_voice")
             return
         }
         let utterance = AVSpeechUtterance(string: t)

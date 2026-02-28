@@ -11,6 +11,12 @@ final class StatisticsViewModel: ObservableObject {
     private let appViewModel: AppViewModel
     private let db = DatabaseManager.shared
 
+    @Published private(set) var masteredCount = 0
+    @Published private(set) var learningCount = 0
+    @Published private(set) var newCount = 0
+    @Published private(set) var masteredCards: [Flashcard] = []
+    @Published private(set) var frequentlyWrongCards: [(flashcard: Flashcard, count: Int)] = []
+
     var subjects: [Subject] { appViewModel.subjects }
     var streakInfo: StreakInfo { appViewModel.streakInfo }
     var totalCards: Int {
@@ -24,5 +30,23 @@ final class StatisticsViewModel: ObservableObject {
 
     func loadData() {
         appViewModel.loadData()
+        let masteredIds = db.getMasteredFlashcardIds()
+        let learningIds = db.getLearningFlashcardIds()
+        masteredCount = masteredIds.count
+        learningCount = learningIds.count
+        newCount = max(0, totalCards - masteredCount - learningCount)
+    }
+
+    func loadMasteredCards() {
+        let ids = db.getMasteredFlashcardIds()
+        masteredCards = ids.compactMap { db.loadFlashcard(byId: $0) }
+    }
+
+    func loadFrequentlyWrongCards() {
+        let wrongIds = db.getFrequentlyWrongFlashcardIds()
+        frequentlyWrongCards = wrongIds.compactMap { item in
+            guard let card = db.loadFlashcard(byId: item.id) else { return nil }
+            return (flashcard: card, count: item.count)
+        }
     }
 }

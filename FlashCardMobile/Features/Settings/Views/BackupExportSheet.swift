@@ -30,7 +30,7 @@ struct BackupExportSheet: View {
                         performBackup()
                     } label: {
                         Label {
-                            Text("Sao lưu SQLite")
+                            Text(L("backup.save_sqlite"))
                                 .foregroundStyle(Color(UIColor.label))
                         } icon: {
                             Image(systemName: "externaldrive.badge.plus")
@@ -43,7 +43,7 @@ struct BackupExportSheet: View {
                         performExport()
                     } label: {
                         Label {
-                            Text("Xuất SQLite")
+                            Text(L("backup.export_sqlite"))
                                 .foregroundStyle(Color(UIColor.label))
                         } icon: {
                             Image(systemName: "square.and.arrow.up")
@@ -56,7 +56,7 @@ struct BackupExportSheet: View {
                         showRestorePicker = true
                     } label: {
                         Label {
-                            Text("Khôi phục từ backup")
+                            Text(L("backup.restore"))
                                 .foregroundStyle(Color(UIColor.label))
                         } icon: {
                             Image(systemName: "arrow.uturn.backward.circle")
@@ -65,16 +65,16 @@ struct BackupExportSheet: View {
                     }
                     .buttonStyle(.plain)
                 } header: {
-                    Text("Sao lưu & Khôi phục")
+                    Text(L("backup.title"))
                 } footer: {
-                    Text("Sao lưu lưu vào Files > FlashCardMobile > Backups. Xuất SQLite chia sẻ file qua iCloud, AirDrop, v.v.")
+                    Text(L("backup.footer"))
                 }
             }
-            .navigationTitle("Sao lưu dữ liệu")
+            .navigationTitle(L("backup.data_section"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") {
+                    Button(L("common.close")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
@@ -99,7 +99,7 @@ struct BackupExportSheet: View {
                         onRestoreSuccess()
                         onDismiss()
                     } else {
-                        errorMessage = "Không thể khôi phục file."
+                        errorMessage = L("backup.restore_error")
                         showError = true
                     }
                 case .failure(let err):
@@ -107,7 +107,7 @@ struct BackupExportSheet: View {
                     showError = true
                 }
             }
-            .alert("Lỗi", isPresented: $showError) {
+            .alert(L("common.error"), isPresented: $showError) {
                 Button("OK", role: .cancel) {
                     HapticFeedback.impact()
                     showError = false
@@ -115,7 +115,7 @@ struct BackupExportSheet: View {
             } message: {
                 Text(errorMessage ?? "Không xác định")
             }
-            .alert("Đã sao lưu", isPresented: $showSuccess) {
+            .alert(L("backup.saved_title"), isPresented: $showSuccess) {
                 Button("OK", role: .cancel) {
                     HapticFeedback.impact()
                     showSuccess = false
@@ -128,10 +128,10 @@ struct BackupExportSheet: View {
 
     private func performBackup() {
         if let url = DatabaseManager.shared.backupDatabase() {
-            successMessage = "Đã lưu vào:\n\(url.lastPathComponent)\n\nMở Files > FlashCardMobile > Backups để xem."
+            successMessage = L("backup.saved_message", url.lastPathComponent)
             showSuccess = true
         } else {
-            errorMessage = "Không thể sao lưu database."
+            errorMessage = L("backup.save_error")
             showError = true
         }
     }
@@ -141,7 +141,7 @@ struct BackupExportSheet: View {
             shareItem = url
             showShareSheet = true
         } else {
-            errorMessage = "Không thể tạo file xuất."
+            errorMessage = L("backup.export_error")
             showError = true
         }
     }

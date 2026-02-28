@@ -13,9 +13,9 @@ struct ReadingListScreen: View {
         Group {
             if topic.readings.isEmpty {
                 ContentUnavailableView(
-                    "Chưa có bài đọc",
+                    L("reading.empty"),
                     systemImage: "doc.text",
-                    description: Text("Chủ đề này chưa có bài đọc nào.")
+                    description: Text(L("reading.empty_desc"))
                 )
             } else {
                 List(topic.readings) { passage in
@@ -61,7 +61,7 @@ struct ReadingDetailScreen: View {
             .padding()
         }
         .background(AppTheme.surface)
-        .navigationTitle("Bài đọc")
+        .navigationTitle(L("reading.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

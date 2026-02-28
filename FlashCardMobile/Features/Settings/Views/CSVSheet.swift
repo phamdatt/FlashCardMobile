@@ -22,16 +22,16 @@ struct CSVExportSheet: View {
                 Image(systemName: "doc.text.fill")
                     .font(.system(size: 56))
                     .foregroundStyle(AppTheme.primary)
-                Text("Xuất từ vựng ra CSV")
+                Text(L("csv.export_title"))
                     .font(.headline)
-                Text("Chủ đề: \(topicName)")
+                Text(L("csv.export_topic", topicName))
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
                 Button {
                     HapticFeedback.impact()
                     exportAndShare()
                 } label: {
-                    Label("Xuất và chia sẻ", systemImage: "square.and.arrow.up")
+                    Label(L("csv.export_action"), systemImage: "square.and.arrow.up")
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -44,11 +44,11 @@ struct CSVExportSheet: View {
             .padding(32)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppTheme.surface)
-            .navigationTitle("Xuất CSV")
+            .navigationTitle(L("csv.export_nav"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") {
+                    Button(L("common.close")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
@@ -59,7 +59,7 @@ struct CSVExportSheet: View {
                     ShareSheet(items: [url])
                 }
             }
-            .alert("Lỗi xuất CSV", isPresented: $showError) {
+            .alert(L("csv.export_error"), isPresented: $showError) {
                 Button("OK", role: .cancel) {
                     HapticFeedback.impact()
                     showError = false
@@ -74,7 +74,7 @@ struct CSVExportSheet: View {
         errorMessage = nil
         let csv = DatabaseManager.shared.exportFlashcardsToCSV(topicId: topicId)
         if csv.isEmpty {
-            errorMessage = "Không có dữ liệu để xuất."
+            errorMessage = L("csv.no_data")
             showError = true
             return
         }
@@ -113,18 +113,18 @@ struct CSVImportSheet: View {
                 Image(systemName: "doc.text.badge.plus")
                     .font(.system(size: 56))
                     .foregroundStyle(AppTheme.primary)
-                Text("Nhập từ vựng từ CSV")
+                Text(L("csv.import_title"))
                     .font(.headline)
-                Text("Chủ đề: \(topicName)")
+                Text(L("csv.import_topic", topicName))
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
                 if importDone {
                     VStack(spacing: 8) {
-                        Text("Đã nhập \(importedCount) từ vựng")
+                        Text(L("csv.import_success", importedCount))
                             .font(.headline)
                             .foregroundStyle(AppTheme.accentGreen)
                         if !importErrors.isEmpty {
-                            Text("\(importErrors.count) lỗi")
+                            Text(L("csv.import_errors", importErrors.count))
                                 .font(.caption)
                                 .foregroundStyle(AppTheme.accentRed)
                         }
@@ -134,7 +134,7 @@ struct CSVImportSheet: View {
                         HapticFeedback.impact()
                         showFilePicker = true
                     } label: {
-                        Label("Chọn file CSV", systemImage: "folder.badge.plus")
+                        Label(L("csv.import_pick"), systemImage: "folder.badge.plus")
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -148,11 +148,11 @@ struct CSVImportSheet: View {
             .padding(32)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppTheme.surface)
-            .navigationTitle("Nhập CSV")
+            .navigationTitle(L("csv.import_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") {
+                    Button(L("common.close")) {
                         HapticFeedback.impact()
                         onDismiss()
                     }
